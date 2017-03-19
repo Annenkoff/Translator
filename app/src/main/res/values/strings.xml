@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Translator</string>
+    <string name="type_text_for_translation">Type</string>
+</resources>
