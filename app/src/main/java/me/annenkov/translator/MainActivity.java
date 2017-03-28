@@ -19,33 +19,33 @@ import org.jsoup.nodes.Document;
 public class MainActivity extends AppCompatActivity {
     private final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
 
-    private ImageButton changeLanguageButton;
-    private Button firstLanguageButton;
-    private Button secondLanguageButton;
+    private ImageButton mChangeLanguageButton;
+    private Button mFirstLanguageButton;
+    private Button mSecondLanguageButton;
 
-    private EditText inputText;
-    private TextView translatedText;
+    private EditText mInputText;
+    private TextView mTranslatedText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        changeLanguageButton = (ImageButton) findViewById(R.id.changeLanguage);
-        firstLanguageButton = (Button) findViewById(R.id.firstLanguage);
-        secondLanguageButton = (Button) findViewById(R.id.secondLanguage);
+        mChangeLanguageButton = (ImageButton) findViewById(R.id.changeLanguage);
+        mFirstLanguageButton = (Button) findViewById(R.id.firstLanguage);
+        mSecondLanguageButton = (Button) findViewById(R.id.secondLanguage);
 
-        inputText = (EditText) findViewById(R.id.inputText);
-        translatedText = (TextView) findViewById(R.id.translatedText);
+        mInputText = (EditText) findViewById(R.id.inputText);
+        mTranslatedText = (TextView) findViewById(R.id.translatedText);
 
-        changeLanguageButton.setOnClickListener(new View.OnClickListener() {
+        mChangeLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
         });
 
-        firstLanguageButton.setOnClickListener(new View.OnClickListener() {
+        mFirstLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectFirstLanguageActivity.class);
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        secondLanguageButton.setOnClickListener(new View.OnClickListener() {
+        mSecondLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectSecondLanguageActivity.class);
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        inputText.addTextChangedListener(new TextWatcher() {
+        mInputText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     new AsyncRequest().execute(YANDEX_API_KEY, s.toString());
                 } catch (Exception e) {
-                    translatedText.setText(e.toString());
+                    mTranslatedText.setText(e.toString());
                 }
             }
 
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            translatedText.setText(s);
+            mTranslatedText.setText(s);
         }
     }
 }

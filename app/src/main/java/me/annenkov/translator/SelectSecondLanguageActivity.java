@@ -21,13 +21,11 @@ public class SelectSecondLanguageActivity extends AppCompatActivity {
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        // если мы уверены, что изменения в контенте не изменят размер layout-а RecyclerView
         // передаем параметр true - это увеличивает производительность
         mRecyclerView.setHasFixedSize(true);
 
         // используем linear layout manager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // создаем адаптер
 
         updateUI();
     }
@@ -43,11 +41,11 @@ public class SelectSecondLanguageActivity extends AppCompatActivity {
     }
 
     private class SecondLanguageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView nameOfLanguage;
+        public TextView mNameOfLanguage;
 
         public SecondLanguageHolder(View itemView) {
             super(itemView);
-            this.nameOfLanguage = (TextView) itemView.findViewById(R.id.tv_recycler_language);
+            this.mNameOfLanguage = (TextView) itemView.findViewById(R.id.tv_recycler_language);
         }
 
         @Override
@@ -71,7 +69,7 @@ public class SelectSecondLanguageActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(SelectSecondLanguageActivity.SecondLanguageHolder holder, int position) {
-            holder.nameOfLanguage.setText(mLanguages[position]);
+            holder.mNameOfLanguage.setText(mLanguages[position]);
         }
 
         @Override
