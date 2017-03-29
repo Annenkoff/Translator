@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">Переводчик</string>
     <string name="type_text_for_translation">Введите текст для перевода</string>
+    <string name="russian">Русский</string>
+    <string name="english">Английский</string>
 </resources>
