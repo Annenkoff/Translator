@@ -18,12 +18,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
-    public List<String> mLanguages = new ArrayList<>();
     private Map<String, String> mLanguageReductions = new ArrayMap<>();
     private String mFirstLanguage;
     private String mSecondLanguage;
@@ -48,10 +48,20 @@ public class MainActivity extends AppCompatActivity {
 
         mLanguageReductions.put(getResources().getString(R.string.russian), "ru");
         mLanguageReductions.put(getResources().getString(R.string.english), "en");
-
-        for (String language : mLanguageReductions.keySet()) {
-            mLanguages.add(language);
-        }
+        mLanguageReductions.put(getResources().getString(R.string.polish), "pl");
+        mLanguageReductions.put(getResources().getString(R.string.italian), "it");
+        mLanguageReductions.put(getResources().getString(R.string.german), "de");
+        mLanguageReductions.put(getResources().getString(R.string.portuguese), "pt");
+        mLanguageReductions.put(getResources().getString(R.string.norwegian), "no");
+        mLanguageReductions.put(getResources().getString(R.string.ukrainian), "uk");
+        mLanguageReductions.put(getResources().getString(R.string.greek), "el");
+        mLanguageReductions.put(getResources().getString(R.string.chinese), "zh");
+        mLanguageReductions.put(getResources().getString(R.string.japanese), "ja");
+        mLanguageReductions.put(getResources().getString(R.string.turkish), "tr");
+        mLanguageReductions.put(getResources().getString(R.string.indonesian), "id");
+        mLanguageReductions.put(getResources().getString(R.string.hebrew), "he");
+        mLanguageReductions.put(getResources().getString(R.string.latin), "la");
+        mLanguageReductions.put(getResources().getString(R.string.lithuanian), "lt");
 
         mFirstLanguage = getResources().getString(R.string.russian);
         mSecondLanguage = getResources().getString(R.string.english);
@@ -69,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectFirstLanguageActivity.class);
-                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) mLanguages);
+                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
                 startActivityForResult(intent, 1);
             }
         });
@@ -78,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectSecondLanguageActivity.class);
-                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) mLanguages);
+                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
                 startActivityForResult(intent, 2);
             }
         });
@@ -106,15 +116,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private List getListFromMap(Map map) {
+        List<String> languages = new ArrayList<>();
+        languages.addAll(map.keySet());
+        Collections.sort(languages);
+        return languages;
+    }
+
     public void swapLanguages() {
-        CharSequence buffer = mFirstLanguageButton.getText();
-        mFirstLanguageButton.setText(mSecondLanguageButton.getText());
-        mSecondLanguageButton.setText(buffer);
+        String buffer = getFirstLanguage();
+        setFirstLanguage(getSecondLanguage());
+        setSecondLanguage(buffer);
+        updateUI();
     }
 
     public void updateUI() {
         mFirstLanguageButton.setText(getFirstLanguage());
         mSecondLanguageButton.setText(getSecondLanguage());
+        mInputText.setText("");
     }
 
     public String getFirstLanguage() {
@@ -148,8 +167,20 @@ public class MainActivity extends AppCompatActivity {
         return mLanguageReductions.get(key);
     }
 
-    public List<String> getLanguages() {
-        return mLanguages;
+    public Button getFirstLanguageButton() {
+        return mFirstLanguageButton;
+    }
+
+    public void setFirstLanguageButton(Button firstLanguageButton) {
+        mFirstLanguageButton = firstLanguageButton;
+    }
+
+    public Button getSecondLanguageButton() {
+        return mSecondLanguageButton;
+    }
+
+    public void setSecondLanguageButton(Button secondLanguageButton) {
+        mSecondLanguageButton = secondLanguageButton;
     }
 
     private class AsyncRequest extends AsyncTask<String, Integer, String> {
@@ -159,7 +190,11 @@ public class MainActivity extends AppCompatActivity {
                 String doc = Jsoup.connect("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
                         "key=" + arg[0] +
                         "&text=" + arg[1] +
-                        "&lang=en").ignoreContentType(true).execute().body();
+                        "&lang=" + mLanguageReductions.get(mFirstLanguage) +
+                        "-" + mLanguageReductions.get(mSecondLanguage))
+                        .ignoreContentType(true)
+                        .execute()
+                        .body();
                 String text = new JSONObject(doc).getString("text");
                 return text.substring(2, text.length() - 2);
             } catch (Exception e) {

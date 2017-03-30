@@ -38,7 +38,7 @@ public class SelectFirstLanguageActivity extends AppCompatActivity {
     private void updateUI() {
         mLanguages = getIntent().getStringArrayListExtra("LANGUAGES");
         if (mAdapter == null) {
-            mAdapter = new FirstLanguageAdapter(mLanguages);
+            mAdapter = new FirstLanguageAdapter();
             mRecyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.notifyDataSetChanged();
@@ -50,7 +50,7 @@ public class SelectFirstLanguageActivity extends AppCompatActivity {
 
         public FirstLanguageHolder(View itemView) {
             super(itemView);
-            this.mNameOfLanguage = (TextView) itemView.findViewById(R.id.tv_recycler_language);
+            this.mNameOfLanguage = (TextView) itemView.findViewById(R.id.text_of_one_element);
         }
 
         @Override
@@ -60,12 +60,6 @@ public class SelectFirstLanguageActivity extends AppCompatActivity {
     }
 
     private class FirstLanguageAdapter extends RecyclerView.Adapter<FirstLanguageHolder> {
-        private List<String> mLanguages;
-
-        FirstLanguageAdapter(List<String> mLanguages) {
-            this.mLanguages = mLanguages;
-        }
-
         @Override
         public FirstLanguageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_language, parent, false);

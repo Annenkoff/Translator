@@ -4,4 +4,18 @@
     <string name="type_text_for_translation">Введите текст для перевода</string>
     <string name="russian">Русский</string>
     <string name="english">Английский</string>
+    <string name="polish">Польский</string>
+    <string name="italian">Итальянский</string>
+    <string name="german">Немецкий</string>
+    <string name="portuguese">Португальский</string>
+    <string name="norwegian">Норвежский</string>
+    <string name="ukrainian">Украинский</string>
+    <string name="greek">Греческий</string>
+    <string name="chinese">Китайский</string>
+    <string name="japanese">Японский</string>
+    <string name="turkish">Турецкий</string>
+    <string name="indonesian">Индонезийский</string>
+    <string name="hebrew">Иврит</string>
+    <string name="latin">Латынь</string>
+    <string name="lithuanian">Литовский</string>
 </resources>
