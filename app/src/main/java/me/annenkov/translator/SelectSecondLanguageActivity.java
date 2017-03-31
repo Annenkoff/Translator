@@ -25,11 +25,7 @@ public class SelectSecondLanguageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_language);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-        // передаем параметр true - это увеличивает производительность
         mRecyclerView.setHasFixedSize(true);
-
-        // используем linear layout manager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         updateUI();
