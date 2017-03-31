@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
 
 import java.util.List;
 
@@ -46,11 +46,11 @@ public class SelectFirstLanguageActivity extends AppCompatActivity {
     }
 
     private class FirstLanguageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView mNameOfLanguage;
+        public Button mNameOfLanguage;
 
         public FirstLanguageHolder(View itemView) {
             super(itemView);
-            this.mNameOfLanguage = (TextView) itemView.findViewById(R.id.text_of_one_element);
+            this.mNameOfLanguage = (Button) itemView.findViewById(R.id.text_of_one_element);
         }
 
         @Override
