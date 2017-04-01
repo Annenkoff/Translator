@@ -13,9 +13,9 @@ import android.widget.Button;
 
 import java.util.List;
 
-public class SelectSecondLanguageActivity extends AppCompatActivity {
+public class SelectLanguageActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
-    private SelectSecondLanguageActivity.SecondLanguageAdapter mAdapter;
+    private FirstLanguageAdapter mAdapter;
 
     private List<String> mLanguages;
 
@@ -34,53 +34,50 @@ public class SelectSecondLanguageActivity extends AppCompatActivity {
     private void updateUI() {
         mLanguages = getIntent().getStringArrayListExtra("LANGUAGES");
         if (mAdapter == null) {
-            mAdapter = new SecondLanguageAdapter();
+            mAdapter = new FirstLanguageAdapter();
             mRecyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.notifyDataSetChanged();
         }
     }
 
-    private class SecondLanguageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private class FirstLanguageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public Button mNameOfLanguage;
 
-        public SecondLanguageHolder(View itemView) {
+        public FirstLanguageHolder(View itemView) {
             super(itemView);
             this.mNameOfLanguage = (Button) itemView.findViewById(R.id.text_of_one_element);
         }
 
+        void setOnClickListener() {
+            mNameOfLanguage.setOnClickListener(this);
+        }
+
         @Override
         public void onClick(View view) {
-
+            Intent intent = new Intent();
+            intent.putExtra("LANGUAGE", mNameOfLanguage.getText());
+            setResult(getIntent().getIntExtra("FIRST_OR_SECOND_LANGUAGE", 1), intent);
+            finish();
         }
     }
 
-    private class SecondLanguageAdapter extends RecyclerView.Adapter<SelectSecondLanguageActivity.SecondLanguageHolder> {
+    private class FirstLanguageAdapter extends RecyclerView.Adapter<FirstLanguageHolder> {
         @Override
-        public SelectSecondLanguageActivity.SecondLanguageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public FirstLanguageHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_language, parent, false);
-            view.setOnClickListener(new MyOnClickListener());
-            return new SelectSecondLanguageActivity.SecondLanguageHolder(view);
+            return new FirstLanguageHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(SelectSecondLanguageActivity.SecondLanguageHolder holder, int position) {
+        public void onBindViewHolder(FirstLanguageHolder holder, int position) {
             holder.mNameOfLanguage.setText(mLanguages.get(position));
+            holder.setOnClickListener();
         }
 
         @Override
         public int getItemCount() {
             return mLanguages.size();
-        }
-    }
-
-    class MyOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent();
-            intent.putExtra("LANGUAGE", mLanguages.get(mRecyclerView.indexOfChild(v)));
-            setResult(2, intent);
-            finish();
         }
     }
 }

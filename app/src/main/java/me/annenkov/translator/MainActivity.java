@@ -78,8 +78,9 @@ public class MainActivity extends AppCompatActivity {
         mFirstLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SelectFirstLanguageActivity.class);
+                Intent intent = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
+                intent.putExtra("FIRST_OR_SECOND_LANGUAGE", 1);
                 startActivityForResult(intent, 1);
             }
         });
@@ -87,8 +88,9 @@ public class MainActivity extends AppCompatActivity {
         mSecondLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SelectSecondLanguageActivity.class);
+                Intent intent = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
+                intent.putExtra("FIRST_OR_SECOND_LANGUAGE", 2);
                 startActivityForResult(intent, 2);
             }
         });
