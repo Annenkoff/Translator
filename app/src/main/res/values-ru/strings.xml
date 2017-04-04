@@ -18,4 +18,7 @@
     <string name="hebrew">Иврит</string>
     <string name="latin">Латынь</string>
     <string name="lithuanian">Литовский</string>
+    <string name="settings">Настройки</string>
+    <string name="history">История</string>
+    <string name="favorites">Избранное</string>
 </resources>

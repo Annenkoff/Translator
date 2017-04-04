@@ -3,15 +3,19 @@ package me.annenkov.translator;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.ArrayMap;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
@@ -25,6 +29,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
     private final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
     private Map<String, String> mLanguageReductions = new ArrayMap<>();
+    private List<HistoryElement> mHistoryElements = new ArrayList<>();
     private String mFirstLanguage;
     private String mSecondLanguage;
     private ImageButton mSwapLanguageButton;
@@ -62,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
         mLanguageReductions.put(getResources().getString(R.string.hebrew), "he");
         mLanguageReductions.put(getResources().getString(R.string.latin), "la");
         mLanguageReductions.put(getResources().getString(R.string.lithuanian), "lt");
+
+        //TODO: отрезок кода ниже заменить нормальным, работающим
+        mHistoryElements.add(new HistoryElement("RU", "EN", "Лол", "Lol"));
+        mHistoryElements.add(new HistoryElement("RU", "EN", "Кек", "Kek"));
 
         mFirstLanguage = getResources().getString(R.string.russian);
         mSecondLanguage = getResources().getString(R.string.english);
@@ -183,6 +192,34 @@ public class MainActivity extends AppCompatActivity {
 
     public void setSecondLanguageButton(Button secondLanguageButton) {
         mSecondLanguageButton = secondLanguageButton;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(1, 1, 1, getResources().getString(R.string.favorites));
+        menu.add(1, 2, 2, getResources().getString(R.string.history));
+        menu.add(1, 3, 3, getResources().getString(R.string.settings));
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case 1:
+                Toast.makeText(this, "Скоро будет работать", Toast.LENGTH_SHORT).show();
+                break;
+            case 2:
+                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 1);
+                break;
+            case 3:
+                Toast.makeText(this, "Скоро будет работать", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class AsyncRequest extends AsyncTask<String, Integer, String> {

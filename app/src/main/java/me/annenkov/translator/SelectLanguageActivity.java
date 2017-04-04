@@ -24,7 +24,7 @@ public class SelectLanguageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_language);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_select_language);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -42,11 +42,11 @@ public class SelectLanguageActivity extends AppCompatActivity {
     }
 
     private class FirstLanguageHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public Button mNameOfLanguage;
+        private Button mNameOfLanguage;
 
-        public FirstLanguageHolder(View itemView) {
+        FirstLanguageHolder(View itemView) {
             super(itemView);
-            this.mNameOfLanguage = (Button) itemView.findViewById(R.id.text_of_one_element);
+            this.mNameOfLanguage = (Button) itemView.findViewById(R.id.text_of_one_language_element);
         }
 
         void setOnClickListener() {
