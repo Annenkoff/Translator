@@ -24,9 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
     private final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
+    Timer mTimer;
     private Map<String, String> mLanguageReductions = new ArrayMap<>();
     private List<HistoryElement> mHistoryElements = new ArrayList<>();
     private String mFirstLanguage;
@@ -106,13 +108,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
+                    if (mTimer != null) mTimer.cancel();
                     String request = new AsyncRequest().execute(YANDEX_API_KEY, s.toString()).get();
                     mTranslatedText.setText(request);
                     if (!request.equals("") || !request.isEmpty()) {
-                        mHistoryElements.add(0, new HistoryElement(mLanguageReductions.get(getFirstLanguage()),
-                                mLanguageReductions.get(getSecondLanguage()),
+                        mTimer = new Timer(true);
+                        mTimer.schedule(new TimerTask(new HistoryElement(mLanguageReductions.get(getFirstLanguage()).toUpperCase(),
+                                mLanguageReductions.get(getSecondLanguage()).toUpperCase(),
                                 s.toString(),
-                                request));
+                                request)), 1650);
+
                     }
                 } catch (Exception e) {
                     mTranslatedText.setText("");
@@ -225,6 +230,19 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    class TimerTask extends java.util.TimerTask {
+        private HistoryElement mHistoryElement;
+
+        public TimerTask(HistoryElement historyElement) {
+            mHistoryElement = historyElement;
+        }
+
+        @Override
+        public void run() {
+            mHistoryElements.add(0, mHistoryElement);
+        }
     }
 
     private class AsyncRequest extends AsyncTask<String, Integer, String> {
