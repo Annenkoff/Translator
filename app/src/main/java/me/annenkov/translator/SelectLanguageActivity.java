@@ -57,7 +57,7 @@ public class SelectLanguageActivity extends AppCompatActivity {
         public void onClick(View view) {
             Intent intent = new Intent();
             intent.putExtra("LANGUAGE", mNameOfLanguage.getText());
-            setResult(getIntent().getIntExtra("FIRST_OR_SECOND_LANGUAGE", 1), intent);
+            setResult(RESULT_OK, intent);
             finish();
         }
     }

@@ -1,6 +1,8 @@
 package me.annenkov.translator;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryActivity extends AppCompatActivity {
@@ -18,6 +21,8 @@ public class HistoryActivity extends AppCompatActivity {
     private HistoryActivity.HistoryAdapter mAdapter;
 
     private List<HistoryElement> mHistoryElements;
+
+    private boolean isOnlyFavorites;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,17 +33,39 @@ public class HistoryActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        isOnlyFavorites = getIntent().getBooleanExtra("IS_ONLY_FAVORITES", false);
+
         updateUI();
     }
 
     private void updateUI() {
-        mHistoryElements = (List<HistoryElement>) getIntent().getSerializableExtra("HISTORY");
+        mHistoryElements = getElements(isOnlyFavorites);
         if (mAdapter == null) {
             mAdapter = new HistoryActivity.HistoryAdapter();
             mRecyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    private List<HistoryElement> getElements(boolean isOnlyFavorites) {
+        List<HistoryElement> historyElements = (List<HistoryElement>) getIntent().getSerializableExtra("HISTORY");
+        List<HistoryElement> elements;
+        if (isOnlyFavorites) {
+            elements = new ArrayList<>();
+            for (HistoryElement historyElement : historyElements) {
+                if (historyElement.isFavorite()) elements.add(historyElement);
+            }
+        } else {
+            elements = historyElements;
+        }
+        return elements;
     }
 
     private class HistoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -82,6 +109,11 @@ public class HistoryActivity extends AppCompatActivity {
                 addToFavoritesButton.setImageResource(R.drawable.ic_bookmark_black_24dp);
             }
             mHistoryElement.setFavorite(!mHistoryElement.isFavorite());
+            Intent intent = new Intent();
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+            intent.putExtras(bundle);
+            setResult(RESULT_OK, intent);
         }
     }
 

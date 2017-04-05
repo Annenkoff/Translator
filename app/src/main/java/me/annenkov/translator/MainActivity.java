@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,10 +67,6 @@ public class MainActivity extends AppCompatActivity {
         mLanguageReductions.put(getResources().getString(R.string.latin), "la");
         mLanguageReductions.put(getResources().getString(R.string.lithuanian), "lt");
 
-        //TODO: отрезок кода ниже заменить нормальным, работающим
-        mHistoryElements.add(new HistoryElement("RU", "EN", "Лол", "Lol"));
-        mHistoryElements.add(new HistoryElement("RU", "EN", "Кек", "Kek"));
-
         mFirstLanguage = getResources().getString(R.string.russian);
         mSecondLanguage = getResources().getString(R.string.english);
 
@@ -89,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
-                intent.putExtra("FIRST_OR_SECOND_LANGUAGE", 1);
                 startActivityForResult(intent, 1);
             }
         });
@@ -99,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
-                intent.putExtra("FIRST_OR_SECOND_LANGUAGE", 2);
                 startActivityForResult(intent, 2);
             }
         });
@@ -112,11 +105,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Document doc = null;
                 try {
-                    new AsyncRequest().execute(YANDEX_API_KEY, s.toString());
+                    String request = new AsyncRequest().execute(YANDEX_API_KEY, s.toString()).get();
+                    mTranslatedText.setText(request);
+                    if (!request.equals("") || !request.isEmpty()) {
+                        mHistoryElements.add(0, new HistoryElement(mLanguageReductions.get(getFirstLanguage()),
+                                mLanguageReductions.get(getSecondLanguage()),
+                                s.toString(),
+                                request));
+                    }
                 } catch (Exception e) {
-                    mTranslatedText.setText(e.toString());
+                    mTranslatedText.setText("");
                 }
             }
 
@@ -166,32 +165,32 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 1) {
-            setFirstLanguage(data.getStringExtra("LANGUAGE"));
-        } else if (resultCode == 2) {
-            setSecondLanguage(data.getStringExtra("LANGUAGE"));
+        try {
+            switch (requestCode) {
+                case 1:
+                    setFirstLanguage(data.getStringExtra("LANGUAGE"));
+                    break;
+                case 2:
+                    setSecondLanguage(data.getStringExtra("LANGUAGE"));
+                    break;
+                case 3:
+                    List<HistoryElement> historyElements = (List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY");
+                    for (int i = 0; i < mHistoryElements.size(); i++) {
+                        for (int j = 0; j < historyElements.size(); j++) {
+                            if (mHistoryElements.get(i).getUUID().equals(historyElements.get(j).getUUID())) {
+                                mHistoryElements.set(i, historyElements.get(j));
+                            }
+                        }
+                    }
+                    break;
+                case 4:
+                    mHistoryElements = (List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY");
+                    break;
+            }
+        } catch (NullPointerException e) {
+            //TODO: добавить логгирование
         }
         updateUI();
-    }
-
-    public String getReduction(String key) {
-        return mLanguageReductions.get(key);
-    }
-
-    public Button getFirstLanguageButton() {
-        return mFirstLanguageButton;
-    }
-
-    public void setFirstLanguageButton(Button firstLanguageButton) {
-        mFirstLanguageButton = firstLanguageButton;
-    }
-
-    public Button getSecondLanguageButton() {
-        return mSecondLanguageButton;
-    }
-
-    public void setSecondLanguageButton(Button secondLanguageButton) {
-        mSecondLanguageButton = secondLanguageButton;
     }
 
     @Override
@@ -206,14 +205,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case 1:
-                Toast.makeText(this, "Скоро будет работать", Toast.LENGTH_SHORT).show();
+                Intent firstIntent = new Intent(MainActivity.this, HistoryActivity.class);
+                Bundle firstBundle = new Bundle();
+                firstBundle.putBoolean("IS_ONLY_FAVORITES", true);
+                firstBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+                firstIntent.putExtras(firstBundle);
+                startActivityForResult(firstIntent, 3);
                 break;
             case 2:
-                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 1);
+                Intent secondIntent = new Intent(MainActivity.this, HistoryActivity.class);
+                Bundle secondBundle = new Bundle();
+                secondBundle.putBoolean("IS_ONLY_FAVORITES", false);
+                secondBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+                secondIntent.putExtras(secondBundle);
+                startActivityForResult(secondIntent, 4);
                 break;
             case 3:
                 Toast.makeText(this, "Скоро будет работать", Toast.LENGTH_SHORT).show();
@@ -239,12 +244,6 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 return "";
             }
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            mTranslatedText.setText(s);
         }
     }
 }
