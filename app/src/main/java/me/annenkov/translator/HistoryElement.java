@@ -1,10 +1,7 @@
 package me.annenkov.translator;
 
 import android.os.Parcel;
-import android.os.ParcelUuid;
 import android.os.Parcelable;
-
-import java.util.UUID;
 
 public class HistoryElement implements Parcelable {
     public static final Creator<HistoryElement> CREATOR = new Creator<HistoryElement>() {
@@ -18,7 +15,6 @@ public class HistoryElement implements Parcelable {
             return new HistoryElement[size];
         }
     };
-    private ParcelUuid mUUID;
     private String firstLanguageReduction;
     private String secondLanguageReduction;
     private String firstText;
@@ -26,7 +22,6 @@ public class HistoryElement implements Parcelable {
     private boolean isFavorite;
 
     public HistoryElement(String firstLanguageReduction, String secondLanguageReduction, String firstText, String secondText) {
-        this.mUUID = new ParcelUuid(UUID.randomUUID());
         this.firstLanguageReduction = firstLanguageReduction;
         this.secondLanguageReduction = secondLanguageReduction;
         this.firstText = firstText;
@@ -35,7 +30,6 @@ public class HistoryElement implements Parcelable {
     }
 
     public HistoryElement(String firstLanguageReduction, String secondLanguageReduction, String firstText, String secondText, boolean isFavorite) {
-        this.mUUID = new ParcelUuid(UUID.randomUUID());
         this.firstLanguageReduction = firstLanguageReduction;
         this.secondLanguageReduction = secondLanguageReduction;
         this.firstText = firstText;
@@ -44,16 +38,11 @@ public class HistoryElement implements Parcelable {
     }
 
     protected HistoryElement(Parcel in) {
-        mUUID = in.readParcelable(ParcelUuid.class.getClassLoader());
         firstLanguageReduction = in.readString();
         secondLanguageReduction = in.readString();
         firstText = in.readString();
         secondText = in.readString();
         isFavorite = in.readByte() != 0;
-    }
-
-    public UUID getUUID() {
-        return mUUID.getUuid();
     }
 
     public String getFirstLanguageReduction() {
@@ -87,11 +76,33 @@ public class HistoryElement implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(mUUID, flags);
         dest.writeString(firstLanguageReduction);
         dest.writeString(secondLanguageReduction);
         dest.writeString(firstText);
         dest.writeString(secondText);
         dest.writeByte((byte) (isFavorite ? 1 : 0));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        HistoryElement that = (HistoryElement) o;
+
+        if (!firstLanguageReduction.equals(that.firstLanguageReduction)) return false;
+        if (!secondLanguageReduction.equals(that.secondLanguageReduction)) return false;
+        if (!firstText.equals(that.firstText)) return false;
+        return secondText.equals(that.secondText);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = firstLanguageReduction.hashCode();
+        result = 31 * result + secondLanguageReduction.hashCode();
+        result = 31 * result + firstText.hashCode();
+        result = 31 * result + secondText.hashCode();
+        return result;
     }
 }

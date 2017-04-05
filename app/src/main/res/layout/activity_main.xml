@@ -3,6 +3,8 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
                 tools:context="me.annenkov.translator.MainActivity">
 
     <ImageButton
@@ -45,6 +47,15 @@
         android:minHeight="150dp"
         android:padding="10dp"
         android:textSize="22sp"/>
+
+    <ImageButton
+        android:id="@+id/addToFavoritesButtonMain"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignEnd="@id/inputText"
+        android:layout_alignTop="@id/inputText"
+        android:src="@drawable/ic_bookmark_outline_black_24dp"/>
 
     <TextView
         android:id="@+id/translatedText"

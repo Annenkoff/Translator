@@ -48,12 +48,6 @@ public class HistoryActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-    }
-
     private List<HistoryElement> getElements(boolean isOnlyFavorites) {
         List<HistoryElement> historyElements = (List<HistoryElement>) getIntent().getSerializableExtra("HISTORY");
         List<HistoryElement> elements;

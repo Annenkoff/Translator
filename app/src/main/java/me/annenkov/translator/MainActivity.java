@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     private Button mSecondLanguageButton;
     private EditText mInputText;
     private TextView mTranslatedText;
+    private ImageButton mAddToFavoritesButton;
+
+    private HistoryElement mCurrentHistoryElement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
         mInputText = (EditText) findViewById(R.id.inputText);
         mTranslatedText = (TextView) findViewById(R.id.translatedText);
+
+        mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
 
         mLanguageReductions.put(getResources().getString(R.string.russian), "ru");
         mLanguageReductions.put(getResources().getString(R.string.english), "en");
@@ -72,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
         mFirstLanguage = getResources().getString(R.string.russian);
         mSecondLanguage = getResources().getString(R.string.english);
 
-        updateUI();
+        mCurrentHistoryElement = new HistoryElement("", "", "", "");
+
+        reloadUI();
 
         mSwapLanguageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +106,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mAddToFavoritesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mCurrentHistoryElement.getFirstText().isEmpty()) return;
+                mTimer.cancel();
+                int elementIndex = getElementInHistoryIndex(mCurrentHistoryElement);
+                if (elementIndex != 0) {
+                    mCurrentHistoryElement.setFavorite(!mCurrentHistoryElement.isFavorite());
+                    mHistoryElements.add(0, mCurrentHistoryElement);
+                } else {
+                    mHistoryElements.get(0).setFavorite(!mHistoryElements.get(0).isFavorite());
+                }
+                updateAddToFavoritesButton(mCurrentHistoryElement);
+            }
+        });
+
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -111,13 +134,14 @@ public class MainActivity extends AppCompatActivity {
                     if (mTimer != null) mTimer.cancel();
                     String request = new AsyncRequest().execute(YANDEX_API_KEY, s.toString()).get();
                     mTranslatedText.setText(request);
-                    if (!request.equals("") || !request.isEmpty()) {
+                    mCurrentHistoryElement = new HistoryElement(mLanguageReductions.get(getFirstLanguage()).toUpperCase(),
+                            mLanguageReductions.get(getSecondLanguage()).toUpperCase(),
+                            s.toString(),
+                            request);
+                    updateAddToFavoritesButton(mCurrentHistoryElement);
+                    if ((!request.equals("") || !request.isEmpty())) {
                         mTimer = new Timer(true);
-                        mTimer.schedule(new TimerTask(new HistoryElement(mLanguageReductions.get(getFirstLanguage()).toUpperCase(),
-                                mLanguageReductions.get(getSecondLanguage()).toUpperCase(),
-                                s.toString(),
-                                request)), 1650);
-
+                        mTimer.schedule(new TimerTask(mCurrentHistoryElement), 1650);
                     }
                 } catch (Exception e) {
                     mTranslatedText.setText("");
@@ -142,13 +166,48 @@ public class MainActivity extends AppCompatActivity {
         String buffer = getFirstLanguage();
         setFirstLanguage(getSecondLanguage());
         setSecondLanguage(buffer);
+        reloadUI();
+    }
+
+    public void reloadUI() {
         updateUI();
+        mInputText.setText("");
     }
 
     public void updateUI() {
         mFirstLanguageButton.setText(getFirstLanguage());
         mSecondLanguageButton.setText(getSecondLanguage());
-        mInputText.setText("");
+        updateAddToFavoritesButton(mCurrentHistoryElement);
+    }
+
+    public boolean isElementInHistory(HistoryElement historyElement) {
+        return getElementInHistory(historyElement) != null;
+    }
+
+    public HistoryElement getElementInHistory(HistoryElement historyElement) {
+        for (HistoryElement historyElementInList : mHistoryElements) {
+            if (historyElementInList.equals(historyElement)) {
+                return historyElementInList;
+            }
+        }
+        return null;
+    }
+
+    public Integer getElementInHistoryIndex(HistoryElement historyElement) {
+        for (int i = 0; i < mHistoryElements.size(); i++) {
+            if (mHistoryElements.get(i).equals(historyElement)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public void updateAddToFavoritesButton(HistoryElement historyElement) {
+        if (historyElement.isFavorite()) {
+            mAddToFavoritesButton.setImageResource(R.drawable.ic_bookmark_black_24dp);
+        } else {
+            mAddToFavoritesButton.setImageResource(R.drawable.ic_bookmark_outline_black_24dp);
+        }
     }
 
     public String getFirstLanguage() {
@@ -182,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                     List<HistoryElement> historyElements = (List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY");
                     for (int i = 0; i < mHistoryElements.size(); i++) {
                         for (int j = 0; j < historyElements.size(); j++) {
-                            if (mHistoryElements.get(i).getUUID().equals(historyElements.get(j).getUUID())) {
+                            if (mHistoryElements.get(i).equals(historyElements.get(j))) {
                                 mHistoryElements.set(i, historyElements.get(j));
                             }
                         }
@@ -195,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (NullPointerException e) {
             //TODO: добавить логгирование
         }
-        updateUI();
+        reloadUI();
     }
 
     @Override
