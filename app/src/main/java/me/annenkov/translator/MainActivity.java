@@ -1,7 +1,6 @@
 package me.annenkov.translator;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
@@ -17,22 +16,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
+
+import me.annenkov.translator.manager.HistoryManager;
+import me.annenkov.translator.manager.LanguagesManager;
+import me.annenkov.translator.manager.NetworkManager;
+import me.annenkov.translator.model.HistoryElement;
 
 public class MainActivity extends AppCompatActivity {
-    private final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
-    Timer mTimer;
-    private Map<String, String> mLanguageReductions = new ArrayMap<>();
-    private List<HistoryElement> mHistoryElements = new ArrayList<>();
-    private String mFirstLanguage;
-    private String mSecondLanguage;
+    private String mYandexApiKey;
     private ImageButton mSwapLanguageButton;
     private Button mFirstLanguageButton;
     private Button mSecondLanguageButton;
@@ -40,12 +34,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView mTranslatedText;
     private ImageButton mAddToFavoritesButton;
 
-    private HistoryElement mCurrentHistoryElement;
+    private HistoryManager mHistoryManager;
+    private LanguagesManager mLanguagesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mYandexApiKey = getResources().getString(R.string.yandex_api_key);
 
         mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
         mFirstLanguageButton = (Button) findViewById(R.id.firstLanguage);
@@ -57,27 +54,29 @@ public class MainActivity extends AppCompatActivity {
 
         mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
 
-        mLanguageReductions.put(getResources().getString(R.string.russian), "ru");
-        mLanguageReductions.put(getResources().getString(R.string.english), "en");
-        mLanguageReductions.put(getResources().getString(R.string.polish), "pl");
-        mLanguageReductions.put(getResources().getString(R.string.italian), "it");
-        mLanguageReductions.put(getResources().getString(R.string.german), "de");
-        mLanguageReductions.put(getResources().getString(R.string.portuguese), "pt");
-        mLanguageReductions.put(getResources().getString(R.string.norwegian), "no");
-        mLanguageReductions.put(getResources().getString(R.string.ukrainian), "uk");
-        mLanguageReductions.put(getResources().getString(R.string.greek), "el");
-        mLanguageReductions.put(getResources().getString(R.string.chinese), "zh");
-        mLanguageReductions.put(getResources().getString(R.string.japanese), "ja");
-        mLanguageReductions.put(getResources().getString(R.string.turkish), "tr");
-        mLanguageReductions.put(getResources().getString(R.string.indonesian), "id");
-        mLanguageReductions.put(getResources().getString(R.string.hebrew), "he");
-        mLanguageReductions.put(getResources().getString(R.string.latin), "la");
-        mLanguageReductions.put(getResources().getString(R.string.lithuanian), "lt");
+        String firstLanguage = getResources().getString(R.string.russian);
+        String secondLanguage = getResources().getString(R.string.english);
 
-        mFirstLanguage = getResources().getString(R.string.russian);
-        mSecondLanguage = getResources().getString(R.string.english);
+        Map<String, String> languageReductions = new ArrayMap<>();
+        languageReductions.put(getResources().getString(R.string.russian), "ru");
+        languageReductions.put(getResources().getString(R.string.english), "en");
+        languageReductions.put(getResources().getString(R.string.polish), "pl");
+        languageReductions.put(getResources().getString(R.string.italian), "it");
+        languageReductions.put(getResources().getString(R.string.german), "de");
+        languageReductions.put(getResources().getString(R.string.portuguese), "pt");
+        languageReductions.put(getResources().getString(R.string.norwegian), "no");
+        languageReductions.put(getResources().getString(R.string.ukrainian), "uk");
+        languageReductions.put(getResources().getString(R.string.greek), "el");
+        languageReductions.put(getResources().getString(R.string.chinese), "zh");
+        languageReductions.put(getResources().getString(R.string.japanese), "ja");
+        languageReductions.put(getResources().getString(R.string.turkish), "tr");
+        languageReductions.put(getResources().getString(R.string.indonesian), "id");
+        languageReductions.put(getResources().getString(R.string.hebrew), "he");
+        languageReductions.put(getResources().getString(R.string.latin), "la");
+        languageReductions.put(getResources().getString(R.string.lithuanian), "lt");
 
-        mCurrentHistoryElement = new HistoryElement("", "", "", "");
+        mHistoryManager = new HistoryManager();
+        mLanguagesManager = new LanguagesManager(firstLanguage, secondLanguage, languageReductions);
 
         reloadUI();
 
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectLanguageActivity.class);
-                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
+                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) mLanguagesManager.getLanguagesList());
                 startActivityForResult(intent, 1);
             }
         });
@@ -101,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SelectLanguageActivity.class);
-                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) getListFromMap(mLanguageReductions));
+                intent.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) mLanguagesManager.getLanguagesList());
                 startActivityForResult(intent, 2);
             }
         });
@@ -109,16 +108,16 @@ public class MainActivity extends AppCompatActivity {
         mAddToFavoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCurrentHistoryElement.getFirstText().isEmpty()) return;
-                mTimer.cancel();
-                int elementIndex = getElementInHistoryIndex(mCurrentHistoryElement);
+                if (mHistoryManager.getCurrentHistoryElement().getFirstText().isEmpty()) return;
+                mHistoryManager.cancelTimer();
+                int elementIndex = mHistoryManager.getElementInHistoryIndex(mHistoryManager.getCurrentHistoryElement());
                 if (elementIndex != 0) {
-                    mCurrentHistoryElement.setFavorite(!mCurrentHistoryElement.isFavorite());
-                    mHistoryElements.add(0, mCurrentHistoryElement);
+                    mHistoryManager.getCurrentHistoryElement().setFavorite(!mHistoryManager.getCurrentHistoryElement().isFavorite());
+                    mHistoryManager.addHistoryElement(mHistoryManager.getCurrentHistoryElement());
                 } else {
-                    mHistoryElements.get(0).setFavorite(!mHistoryElements.get(0).isFavorite());
+                    mHistoryManager.getFirstHistoryElement().setFavorite(!mHistoryManager.getFirstHistoryElement().isFavorite());
                 }
-                updateAddToFavoritesButton(mCurrentHistoryElement);
+                updateAddToFavoritesButton(mHistoryManager.getCurrentHistoryElement());
             }
         });
 
@@ -130,21 +129,19 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                try {
-                    if (mTimer != null) mTimer.cancel();
-                    String request = new AsyncRequest().execute(YANDEX_API_KEY, s.toString()).get();
-                    mTranslatedText.setText(request);
-                    mCurrentHistoryElement = new HistoryElement(mLanguageReductions.get(getFirstLanguage()).toUpperCase(),
-                            mLanguageReductions.get(getSecondLanguage()).toUpperCase(),
-                            s.toString(),
-                            request);
-                    updateAddToFavoritesButton(mCurrentHistoryElement);
-                    if ((!request.equals("") || !request.isEmpty())) {
-                        mTimer = new Timer(true);
-                        mTimer.schedule(new TimerTask(mCurrentHistoryElement), 1650);
-                    }
-                } catch (Exception e) {
-                    mTranslatedText.setText("");
+                if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
+                String request = new NetworkManager(mYandexApiKey,
+                        s.toString(),
+                        mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
+                        mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage())).getTranslateText();
+                mTranslatedText.setText(request);
+                mHistoryManager.setCurrentHistoryElement(new HistoryElement(mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()).toUpperCase(),
+                        mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage()).toUpperCase(),
+                        s.toString(),
+                        request));
+                updateAddToFavoritesButton(mHistoryManager.getCurrentHistoryElement());
+                if ((!request.equals("") || !request.isEmpty())) {
+                    mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
                 }
             }
 
@@ -155,17 +152,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private List getListFromMap(Map map) {
-        List<String> languages = new ArrayList<>();
-        languages.addAll(map.keySet());
-        Collections.sort(languages);
-        return languages;
-    }
-
     public void swapLanguages() {
-        String buffer = getFirstLanguage();
-        setFirstLanguage(getSecondLanguage());
-        setSecondLanguage(buffer);
+        String buffer = mLanguagesManager.getFirstLanguage();
+        mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
+        mLanguagesManager.setSecondLanguage(buffer);
         reloadUI();
     }
 
@@ -175,31 +165,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateUI() {
-        mFirstLanguageButton.setText(getFirstLanguage());
-        mSecondLanguageButton.setText(getSecondLanguage());
-        updateAddToFavoritesButton(mCurrentHistoryElement);
-    }
-
-    public boolean isElementInHistory(HistoryElement historyElement) {
-        return getElementInHistory(historyElement) != null;
-    }
-
-    public HistoryElement getElementInHistory(HistoryElement historyElement) {
-        for (HistoryElement historyElementInList : mHistoryElements) {
-            if (historyElementInList.equals(historyElement)) {
-                return historyElementInList;
-            }
-        }
-        return null;
-    }
-
-    public Integer getElementInHistoryIndex(HistoryElement historyElement) {
-        for (int i = 0; i < mHistoryElements.size(); i++) {
-            if (mHistoryElements.get(i).equals(historyElement)) {
-                return i;
-            }
-        }
-        return -1;
+        mFirstLanguageButton.setText(mLanguagesManager.getFirstLanguage());
+        mSecondLanguageButton.setText(mLanguagesManager.getSecondLanguage());
+        updateAddToFavoritesButton(mHistoryManager.getCurrentHistoryElement());
     }
 
     public void updateAddToFavoritesButton(HistoryElement historyElement) {
@@ -210,49 +178,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public String getFirstLanguage() {
-        return mFirstLanguage;
-    }
-
-    public void setFirstLanguage(String sFirstLanguage) {
-        this.mFirstLanguage = sFirstLanguage;
-    }
-
-    public String getSecondLanguage() {
-        return mSecondLanguage;
-    }
-
-    public void setSecondLanguage(String sSecondLanguage) {
-        this.mSecondLanguage = sSecondLanguage;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             switch (requestCode) {
                 case 1:
-                    if (getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
-                        setSecondLanguage(getFirstLanguage());
-                    setFirstLanguage(data.getStringExtra("LANGUAGE"));
+                    if (mLanguagesManager.getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
+                        mLanguagesManager.setSecondLanguage(mLanguagesManager.getFirstLanguage());
+                    mLanguagesManager.setFirstLanguage(data.getStringExtra("LANGUAGE"));
                     break;
                 case 2:
-                    if (getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
-                        setFirstLanguage(getSecondLanguage());
-                    setSecondLanguage(data.getStringExtra("LANGUAGE"));
+                    if (mLanguagesManager.getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
+                        mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
+                    mLanguagesManager.setSecondLanguage(data.getStringExtra("LANGUAGE"));
                     break;
                 case 3:
-                    List<HistoryElement> historyElements = (List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY");
-                    for (int i = 0; i < mHistoryElements.size(); i++) {
-                        for (int j = 0; j < historyElements.size(); j++) {
-                            if (mHistoryElements.get(i).equals(historyElements.get(j))) {
-                                mHistoryElements.set(i, historyElements.get(j));
-                            }
-                        }
-                    }
+                    mHistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
                     break;
                 case 4:
-                    mHistoryElements = (List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY");
+                    mHistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
                     break;
             }
         } catch (NullPointerException e) {
@@ -276,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent firstIntent = new Intent(MainActivity.this, HistoryActivity.class);
                 Bundle firstBundle = new Bundle();
                 firstBundle.putBoolean("IS_ONLY_FAVORITES", true);
-                firstBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+                firstBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
                 firstIntent.putExtras(firstBundle);
                 startActivityForResult(firstIntent, 3);
                 break;
@@ -284,47 +229,14 @@ public class MainActivity extends AppCompatActivity {
                 Intent secondIntent = new Intent(MainActivity.this, HistoryActivity.class);
                 Bundle secondBundle = new Bundle();
                 secondBundle.putBoolean("IS_ONLY_FAVORITES", false);
-                secondBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+                secondBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
                 secondIntent.putExtras(secondBundle);
                 startActivityForResult(secondIntent, 4);
                 break;
             case 3:
-                Toast.makeText(this, "Скоро будет работать", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Скоро будет работать.", Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    class TimerTask extends java.util.TimerTask {
-        private HistoryElement mHistoryElement;
-
-        public TimerTask(HistoryElement historyElement) {
-            mHistoryElement = historyElement;
-        }
-
-        @Override
-        public void run() {
-            mHistoryElements.add(0, mHistoryElement);
-        }
-    }
-
-    private class AsyncRequest extends AsyncTask<String, Integer, String> {
-        @Override
-        protected String doInBackground(String... arg) {
-            try {
-                String doc = Jsoup.connect("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
-                        "key=" + arg[0] +
-                        "&text=" + arg[1] +
-                        "&lang=" + mLanguageReductions.get(mFirstLanguage) +
-                        "-" + mLanguageReductions.get(mSecondLanguage))
-                        .ignoreContentType(true)
-                        .execute()
-                        .body();
-                String text = new JSONObject(doc).getString("text");
-                return text.substring(2, text.length() - 2);
-            } catch (Exception e) {
-                return "";
-            }
-        }
     }
 }

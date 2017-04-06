@@ -1,4 +1,4 @@
-package me.annenkov.translator;
+package me.annenkov.translator.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

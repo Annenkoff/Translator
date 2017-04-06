@@ -16,6 +16,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.annenkov.translator.model.HistoryElement;
+
 public class HistoryActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private HistoryActivity.HistoryAdapter mAdapter;
