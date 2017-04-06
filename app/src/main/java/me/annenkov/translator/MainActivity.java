@@ -232,9 +232,13 @@ public class MainActivity extends AppCompatActivity {
         try {
             switch (requestCode) {
                 case 1:
+                    if (getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
+                        setSecondLanguage(getFirstLanguage());
                     setFirstLanguage(data.getStringExtra("LANGUAGE"));
                     break;
                 case 2:
+                    if (getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
+                        setFirstLanguage(getSecondLanguage());
                     setSecondLanguage(data.getStringExtra("LANGUAGE"));
                     break;
                 case 3:
