@@ -15,7 +15,7 @@
         android:layout_alignParentTop="true"
         android:paddingBottom="10dp"
         android:text="Text"
-        android:textColor="@color/colorBlack"
+        android:textColor="@color/black"
         android:textSize="18sp"/>
 
     <TextView
@@ -34,7 +34,7 @@
         android:layout_height="34dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:src="@drawable/bookmark_outline"/>
+        android:src="@drawable/bookmark_outline_white"/>
 
     <TextView
         android:id="@+id/twoLanguageReductions"

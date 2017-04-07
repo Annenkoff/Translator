@@ -3,7 +3,9 @@ package me.annenkov.translator.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class HistoryElement implements Parcelable {
+import com.orm.SugarRecord;
+
+public class HistoryElement extends SugarRecord implements Parcelable {
     public static final Creator<HistoryElement> CREATOR = new Creator<HistoryElement>() {
         @Override
         public HistoryElement createFromParcel(Parcel in) {
@@ -20,6 +22,9 @@ public class HistoryElement implements Parcelable {
     private String firstText;
     private String secondText;
     private boolean isFavorite;
+
+    public HistoryElement() {
+    }
 
     public HistoryElement(String firstLanguageReduction, String secondLanguageReduction, String firstText, String secondText) {
         this.firstLanguageReduction = firstLanguageReduction;

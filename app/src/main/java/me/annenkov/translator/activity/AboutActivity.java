@@ -1,8 +1,10 @@
-package me.annenkov.translator;
+package me.annenkov.translator.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
+import me.annenkov.translator.R;
 
 public class AboutActivity extends AppCompatActivity {
     @Override

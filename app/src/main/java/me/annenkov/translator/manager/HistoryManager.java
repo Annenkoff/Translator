@@ -1,6 +1,7 @@
 package me.annenkov.translator.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 
@@ -8,11 +9,9 @@ import me.annenkov.translator.model.HistoryElement;
 
 public class HistoryManager {
     private Timer mTimer;
-    private List<HistoryElement> mHistoryElements;
     private HistoryElement mCurrentHistoryElement;
 
     public HistoryManager() {
-        mHistoryElements = new ArrayList<>();
         mCurrentHistoryElement = new HistoryElement("", "", "", "");
     }
 
@@ -21,7 +20,7 @@ public class HistoryManager {
     }
 
     public void addHistoryElement(HistoryElement historyElement) {
-        mHistoryElements.add(0, historyElement);
+        historyElement.save();
     }
 
     public void addHistoryElementWithTimer(HistoryElement historyElement, long delay) {
@@ -30,23 +29,26 @@ public class HistoryManager {
     }
 
     public List<HistoryElement> getHistoryElements() {
-        return mHistoryElements;
+        try {
+            List<HistoryElement> historyElements = HistoryElement.listAll(HistoryElement.class);
+            Collections.reverse(historyElements);
+            return historyElements;
+        } catch (NullPointerException e) {
+            return new ArrayList<>();
+        }
     }
 
     public void setHistoryElements(List<HistoryElement> historyElements) {
-        mHistoryElements = historyElements;
+        HistoryElement.deleteAll(HistoryElement.class);
+        HistoryElement.saveInTx(historyElements);
     }
 
     public HistoryElement getFirstHistoryElement() {
-        return mHistoryElements.get(0);
-    }
-
-    public HistoryElement getHistoryElement(int index) {
-        return mHistoryElements.get(index);
+        return HistoryElement.first(HistoryElement.class);
     }
 
     public int getHistoryElementsSize() {
-        return mHistoryElements.size();
+        return HistoryElement.listAll(HistoryElement.class).size();
     }
 
     public void cancelTimer() {
@@ -66,7 +68,8 @@ public class HistoryManager {
     }
 
     public HistoryElement getElementInHistory(HistoryElement historyElement) {
-        for (HistoryElement historyElementInList : mHistoryElements) {
+        List<HistoryElement> historyElements = HistoryElement.listAll(HistoryElement.class);
+        for (HistoryElement historyElementInList : historyElements) {
             if (historyElementInList.equals(historyElement)) {
                 return historyElementInList;
             }
@@ -75,22 +78,25 @@ public class HistoryManager {
     }
 
     public Integer getElementInHistoryIndex(HistoryElement historyElement) {
-        for (int i = 0; i < mHistoryElements.size(); i++) {
-            if (mHistoryElements.get(i).equals(historyElement)) {
+        List<HistoryElement> historyElements = HistoryElement.listAll(HistoryElement.class);
+        for (int i = 0; i < historyElements.size(); i++) {
+            if (historyElements.get(i).equals(historyElement)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public void updateHistory(List<HistoryElement> historyElements) {
-        for (int i = 0; i < mHistoryElements.size(); i++) {
-            for (int j = 0; j < historyElements.size(); j++) {
-                if (mHistoryElements.get(i).equals(historyElements.get(j))) {
-                    mHistoryElements.set(i, historyElements.get(j));
+    public void updateHistory(List<HistoryElement> newHistoryElements) {
+        List<HistoryElement> historyElements = HistoryElement.listAll(HistoryElement.class);
+        for (int i = 0; i < historyElements.size(); i++) {
+            for (int j = 0; j < newHistoryElements.size(); j++) {
+                if (historyElements.get(i).equals(newHistoryElements.get(j))) {
+                    historyElements.set(i, newHistoryElements.get(j));
                 }
             }
         }
+        setHistoryElements(historyElements);
     }
 
     private class TimerTask extends java.util.TimerTask {

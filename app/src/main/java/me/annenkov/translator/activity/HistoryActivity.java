@@ -1,4 +1,4 @@
-package me.annenkov.translator;
+package me.annenkov.translator.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.annenkov.translator.R;
 import me.annenkov.translator.model.HistoryElement;
 
 public class HistoryActivity extends AppCompatActivity {
@@ -116,9 +117,9 @@ public class HistoryActivity extends AppCompatActivity {
 
         private void updateFavoriteButton() {
             if (mHistoryElement.isFavorite()) {
-                addToFavoritesButton.setImageResource(R.drawable.bookmark);
+                addToFavoritesButton.setImageResource(R.drawable.bookmark_black);
             } else {
-                addToFavoritesButton.setImageResource(R.drawable.bookmark_outline);
+                addToFavoritesButton.setImageResource(R.drawable.bookmark_outline_black);
             }
         }
     }

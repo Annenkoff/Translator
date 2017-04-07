@@ -1,4 +1,4 @@
-package me.annenkov.translator;
+package me.annenkov.translator.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.List;
+
+import me.annenkov.translator.R;
 
 public class SelectLanguageActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
