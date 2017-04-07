@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
     public void reloadUI() {
         updateUI();
         clearText();
-        textEmptyAction();
+        textStatusAction("", mTranslatedTextCardView.getVisibility() == View.VISIBLE);
     }
 
     public void clearText() {
@@ -273,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(secondIntent, 4);
                 break;
             case 3:
-                Toast.makeText(this, "Скоро будет работать.", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
