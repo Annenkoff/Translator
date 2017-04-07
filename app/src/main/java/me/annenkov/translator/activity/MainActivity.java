@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
+                offAddToFavoritesButton();
                 textStatusAction(s.toString(), mTranslatedTextCardView.getVisibility() == View.VISIBLE);
                 String request = new NetworkManager(mYandexApiKey,
                         s.toString(),
@@ -116,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage()).toUpperCase(),
                         s.toString(),
                         request));
-                updateAddToFavoritesButton(mHistoryManager.getCurrentHistoryElement());
                 if ((!request.equals("") || !request.isEmpty())) {
                     mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
                 }
@@ -163,6 +163,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateUI();
         clearText();
         textStatusAction("", mTranslatedTextCardView.getVisibility() == View.VISIBLE);
+        offAddToFavoritesButton();
+    }
+
+    private void offAddToFavoritesButton() {
+        mAddToFavoritesButton.setImageResource(R.drawable.bookmark_outline_white);
+    }
+
+    private void onAddToFavoritesButton() {
+        mAddToFavoritesButton.setImageResource(R.drawable.bookmark_white);
     }
 
     public void clearText() {
@@ -172,14 +181,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void updateUI() {
         mFirstLanguageButton.setText(mLanguagesManager.getFirstLanguage());
         mSecondLanguageButton.setText(mLanguagesManager.getSecondLanguage());
-        updateAddToFavoritesButton(mHistoryManager.getCurrentHistoryElement());
+        updateAddToFavoritesButton();
     }
 
-    public void updateAddToFavoritesButton(HistoryElement historyElement) {
-        if (historyElement.isFavorite()) {
-            mAddToFavoritesButton.setImageResource(R.drawable.bookmark_white);
-        } else {
-            mAddToFavoritesButton.setImageResource(R.drawable.bookmark_outline_white);
+    public void updateAddToFavoritesButton() {
+        try {
+            if (mHistoryManager.getFirstHistoryElement().isFavorite()) {
+                onAddToFavoritesButton();
+            } else {
+                offAddToFavoritesButton();
+            }
+        } catch (NullPointerException e) {
         }
     }
 
@@ -269,14 +281,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.addToFavoritesButtonMain:
                 if (mHistoryManager.getCurrentHistoryElement().getFirstText().isEmpty()) return;
                 mHistoryManager.cancelTimer();
-                int elementIndex = mHistoryManager.getElementInHistoryIndex(mHistoryManager.getCurrentHistoryElement());
-                if (elementIndex != 0) {
+                if (mHistoryManager.getElementInHistoryIndex(mHistoryManager.getCurrentHistoryElement()) != 0) {
                     mHistoryManager.getCurrentHistoryElement().setFavorite(!mHistoryManager.getCurrentHistoryElement().isFavorite());
                     mHistoryManager.addHistoryElement(mHistoryManager.getCurrentHistoryElement());
                 } else {
-                    mHistoryManager.getFirstHistoryElement().setFavorite(!mHistoryManager.getFirstHistoryElement().isFavorite());
+                    HistoryElement historyElement = mHistoryManager.getFirstHistoryElement();
+                    historyElement.setFavorite(!mHistoryManager.getFirstHistoryElement().isFavorite());
+                    mHistoryManager.addHistoryElement(historyElement);
                 }
-                updateAddToFavoritesButton(mHistoryManager.getCurrentHistoryElement());
+                updateAddToFavoritesButton();
                 break;
         }
     }

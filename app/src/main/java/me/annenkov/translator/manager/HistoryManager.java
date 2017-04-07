@@ -39,12 +39,13 @@ public class HistoryManager {
     }
 
     public void setHistoryElements(List<HistoryElement> historyElements) {
+        Collections.reverse(historyElements);
         HistoryElement.deleteAll(HistoryElement.class);
         HistoryElement.saveInTx(historyElements);
     }
 
     public HistoryElement getFirstHistoryElement() {
-        return HistoryElement.first(HistoryElement.class);
+        return HistoryElement.last(HistoryElement.class);
     }
 
     public int getHistoryElementsSize() {
@@ -78,7 +79,7 @@ public class HistoryManager {
     }
 
     public Integer getElementInHistoryIndex(HistoryElement historyElement) {
-        List<HistoryElement> historyElements = HistoryElement.listAll(HistoryElement.class);
+        List<HistoryElement> historyElements = getHistoryElements();
         for (int i = 0; i < historyElements.size(); i++) {
             if (historyElements.get(i).equals(historyElement)) {
                 return i;
