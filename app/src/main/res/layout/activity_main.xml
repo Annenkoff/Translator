@@ -3,8 +3,6 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingEnd="8dp"
-                android:paddingStart="8dp"
                 tools:context="me.annenkov.translator.MainActivity">
 
     <ImageButton
@@ -14,7 +12,7 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ic_cached_black_24dp"/>
+        android:src="@drawable/swap_horizontal"/>
 
     <Button
         android:id="@+id/firstLanguage"
@@ -22,8 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/swapLanguage"
-        android:text="@string/russian"/>
+        android:layout_toStartOf="@id/swapLanguage"/>
 
     <Button
         android:id="@+id/secondLanguage"
@@ -31,8 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/swapLanguage"
-        android:text="@string/english"/>
+        android:layout_toEndOf="@id/swapLanguage"/>
 
     <EditText
         android:id="@+id/inputText"
@@ -40,30 +36,56 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/swapLanguage"
         android:layout_centerHorizontal="true"
-        android:ems="10"
         android:hint="@string/type_text_for_translation"
         android:inputType="textMultiLine"
-        android:maxHeight="200dp"
+        android:maxHeight="150dp"
         android:minHeight="150dp"
         android:padding="10dp"
         android:textSize="22sp"/>
 
     <ImageButton
-        android:id="@+id/addToFavoritesButtonMain"
+        android:id="@+id/clearTextMain"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="24dp"
+        android:layout_width="19dp"
         android:layout_height="24dp"
-        android:layout_alignEnd="@id/inputText"
+        android:layout_alignRight="@id/inputText"
         android:layout_alignTop="@id/inputText"
-        android:src="@drawable/ic_bookmark_outline_black_24dp"/>
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/close"/>
 
-    <TextView
-        android:id="@+id/translatedText"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/inputText"
-        android:layout_centerHorizontal="true"
-        android:padding="10dp"
-        android:textColor="@color/colorBlack"
-        android:textSize="22sp"/>
+        android:layout_height="match_parent"
+        android:layout_below="@id/inputText">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/translatedTextCardView"
+            style="@style/TranslatedTextCardViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:scrollbars="vertical">
+
+            <TextView
+                android:id="@+id/translatedText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/inputText"
+                android:layout_centerHorizontal="true"
+                android:layout_margin="15dp"
+                android:textColor="@color/colorBlack"
+                android:textSize="22sp"/>
+
+            <ImageButton
+                android:id="@+id/addToFavoritesButtonMain"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="19dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top|right"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/bookmark_outline"/>
+        </android.support.v7.widget.CardView>
+    </ScrollView>
 </RelativeLayout>

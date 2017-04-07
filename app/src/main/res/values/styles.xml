@@ -8,4 +8,8 @@
         <item name="colorAccent">@color/lightGreen</item>
     </style>
 
+    <style name="TranslatedTextCardViewStyle" parent="Theme.AppCompat.Light">
+        <item name="cardBackgroundColor">@color/superLightRed</item>
+    </style>
+
 </resources>

@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private Button mSecondLanguageButton;
     private EditText mInputText;
     private TextView mTranslatedText;
+    private ImageButton mClearText;
     private ImageButton mAddToFavoritesButton;
+
+    private CardView mTranslatedTextCardView;
 
     private HistoryManager mHistoryManager;
     private LanguagesManager mLanguagesManager;
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         mInputText = (EditText) findViewById(R.id.inputText);
         mTranslatedText = (TextView) findViewById(R.id.translatedText);
 
+        mClearText = (ImageButton) findViewById(R.id.clearTextMain);
         mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
 
         String firstLanguage = getResources().getString(R.string.russian);
@@ -74,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
         languageReductions.put(getResources().getString(R.string.hebrew), "he");
         languageReductions.put(getResources().getString(R.string.latin), "la");
         languageReductions.put(getResources().getString(R.string.lithuanian), "lt");
+
+        mTranslatedTextCardView = (CardView) findViewById(R.id.translatedTextCardView);
 
         mHistoryManager = new HistoryManager();
         mLanguagesManager = new LanguagesManager(firstLanguage, secondLanguage, languageReductions);
@@ -105,6 +113,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mClearText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearText();
+            }
+        });
+
         mAddToFavoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
+                textStatusAction(s.toString(), mTranslatedTextCardView.getVisibility() == View.VISIBLE);
                 String request = new NetworkManager(mYandexApiKey,
                         s.toString(),
                         mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
@@ -152,6 +168,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void textStatusAction(String text, boolean isShowed) {
+        if (!text.isEmpty() && !isShowed) textNotEmptyAction();
+        else if (text.isEmpty() && isShowed) textEmptyAction();
+    }
+
+    public void textNotEmptyAction() {
+        mTranslatedTextCardView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.show_element));
+        mClearText.setVisibility(View.VISIBLE);
+        mTranslatedTextCardView.setVisibility(View.VISIBLE);
+    }
+
+    public void textEmptyAction() {
+        mTranslatedTextCardView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.hide_element));
+        mClearText.setVisibility(View.INVISIBLE);
+        mTranslatedTextCardView.setVisibility(View.INVISIBLE);
+    }
+
     public void swapLanguages() {
         String buffer = mLanguagesManager.getFirstLanguage();
         mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
@@ -161,6 +194,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void reloadUI() {
         updateUI();
+        clearText();
+        textEmptyAction();
+    }
+
+    public void clearText() {
         mInputText.setText("");
     }
 
@@ -172,9 +210,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateAddToFavoritesButton(HistoryElement historyElement) {
         if (historyElement.isFavorite()) {
-            mAddToFavoritesButton.setImageResource(R.drawable.ic_bookmark_black_24dp);
+            mAddToFavoritesButton.setImageResource(R.drawable.bookmark);
         } else {
-            mAddToFavoritesButton.setImageResource(R.drawable.ic_bookmark_outline_black_24dp);
+            mAddToFavoritesButton.setImageResource(R.drawable.bookmark_outline);
         }
     }
 
@@ -187,11 +225,13 @@ public class MainActivity extends AppCompatActivity {
                     if (mLanguagesManager.getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
                         mLanguagesManager.setSecondLanguage(mLanguagesManager.getFirstLanguage());
                     mLanguagesManager.setFirstLanguage(data.getStringExtra("LANGUAGE"));
+                    reloadUI();
                     break;
                 case 2:
                     if (mLanguagesManager.getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
                         mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
                     mLanguagesManager.setSecondLanguage(data.getStringExtra("LANGUAGE"));
+                    reloadUI();
                     break;
                 case 3:
                     mHistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
@@ -201,16 +241,15 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         } catch (NullPointerException e) {
-            //TODO: добавить логгирование
+            updateUI();
         }
-        reloadUI();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(1, 1, 1, getResources().getString(R.string.favorites));
         menu.add(1, 2, 2, getResources().getString(R.string.history));
-        menu.add(1, 3, 3, getResources().getString(R.string.settings));
+        menu.add(1, 3, 3, getResources().getString(R.string.about));
         return super.onCreateOptionsMenu(menu);
     }
 

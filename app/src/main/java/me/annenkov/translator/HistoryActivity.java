@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import me.annenkov.translator.model.HistoryElement;
 public class HistoryActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private HistoryActivity.HistoryAdapter mAdapter;
+    private TextView mEmptyHistoryBackgroundNotificationTextView;
+    private LinearLayout mEmptyHistoryBackgroundNotification;
 
     private List<HistoryElement> mHistoryElements;
 
@@ -35,6 +38,9 @@ public class HistoryActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        mEmptyHistoryBackgroundNotificationTextView = (TextView) findViewById(R.id.empty_history_backgroung_notification_textview);
+        mEmptyHistoryBackgroundNotification = (LinearLayout) findViewById(R.id.empty_history_backgroung_notification);
+
         isOnlyFavorites = getIntent().getBooleanExtra("IS_ONLY_FAVORITES", false);
 
         updateUI();
@@ -42,6 +48,13 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void updateUI() {
         mHistoryElements = getElements(isOnlyFavorites);
+        if (mHistoryElements.size() == 0 && !isOnlyFavorites) {
+            mEmptyHistoryBackgroundNotificationTextView.setText(getResources().getString(R.string.empty_history_message));
+            mEmptyHistoryBackgroundNotification.setVisibility(View.VISIBLE);
+        } else if (mHistoryElements.size() == 0 && isOnlyFavorites) {
+            mEmptyHistoryBackgroundNotificationTextView.setText(getResources().getString(R.string.empty_favorites_message));
+            mEmptyHistoryBackgroundNotification.setVisibility(View.VISIBLE);
+        }
         if (mAdapter == null) {
             mAdapter = new HistoryActivity.HistoryAdapter();
             mRecyclerView.setAdapter(mAdapter);
@@ -86,30 +99,27 @@ public class HistoryActivity extends AppCompatActivity {
             twoLanguageReductions.setText(String.format("%s-%s",
                     historyElement.getFirstLanguageReduction(),
                     historyElement.getSecondLanguageReduction()));
-            if (historyElement.isFavorite()) {
-                addToFavoritesButton.setImageResource(R.drawable.ic_bookmark_black_24dp);
-            } else {
-                addToFavoritesButton.setImageResource(R.drawable.ic_bookmark_outline_black_24dp);
-            }
-        }
-
-        void setOnClickListener() {
+            updateFavoriteButton();
             addToFavoritesButton.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            if (mHistoryElement.isFavorite()) {
-                addToFavoritesButton.setImageResource(R.drawable.ic_bookmark_outline_black_24dp);
-            } else {
-                addToFavoritesButton.setImageResource(R.drawable.ic_bookmark_black_24dp);
-            }
             mHistoryElement.setFavorite(!mHistoryElement.isFavorite());
+            updateFavoriteButton();
             Intent intent = new Intent();
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
             intent.putExtras(bundle);
             setResult(RESULT_OK, intent);
+        }
+
+        private void updateFavoriteButton() {
+            if (mHistoryElement.isFavorite()) {
+                addToFavoritesButton.setImageResource(R.drawable.bookmark);
+            } else {
+                addToFavoritesButton.setImageResource(R.drawable.bookmark_outline);
+            }
         }
     }
 
@@ -123,7 +133,6 @@ public class HistoryActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(HistoryActivity.HistoryHolder holder, int position) {
             holder.bindHolder(mHistoryElements.get(position));
-            holder.setOnClickListener();
         }
 
         @Override
