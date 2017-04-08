@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,6 @@ import com.orm.SugarContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import me.annenkov.translator.R;
 import me.annenkov.translator.manager.HistoryManager;
@@ -30,7 +28,9 @@ import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.model.HistoryElement;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private String mYandexApiKey;
+    private HistoryManager mHistoryManager;
+    private LanguagesManager mLanguagesManager;
+
     private ImageButton mSwapLanguageButton;
     private Button mFirstLanguageButton;
     private Button mSecondLanguageButton;
@@ -38,20 +38,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTranslatedText;
     private ImageButton mClearText;
     private ImageButton mAddToFavoritesButton;
-
     private CardView mTranslatedTextCardView;
-
-    private HistoryManager mHistoryManager;
-    private LanguagesManager mLanguagesManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         SugarContext.init(this);
 
-        mYandexApiKey = getResources().getString(R.string.yandex_api_key);
+        mHistoryManager = new HistoryManager();
+        mLanguagesManager = new LanguagesManager(this);
 
         mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
         mSwapLanguageButton.setOnClickListener(this);
@@ -69,33 +65,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
         mAddToFavoritesButton.setOnClickListener(this);
 
-        String firstLanguage = getResources().getString(R.string.russian);
-        String secondLanguage = getResources().getString(R.string.english);
-
-        Map<String, String> languageReductions = new ArrayMap<>();
-        languageReductions.put(getResources().getString(R.string.russian), "ru");
-        languageReductions.put(getResources().getString(R.string.english), "en");
-        languageReductions.put(getResources().getString(R.string.polish), "pl");
-        languageReductions.put(getResources().getString(R.string.italian), "it");
-        languageReductions.put(getResources().getString(R.string.german), "de");
-        languageReductions.put(getResources().getString(R.string.portuguese), "pt");
-        languageReductions.put(getResources().getString(R.string.norwegian), "no");
-        languageReductions.put(getResources().getString(R.string.ukrainian), "uk");
-        languageReductions.put(getResources().getString(R.string.greek), "el");
-        languageReductions.put(getResources().getString(R.string.chinese), "zh");
-        languageReductions.put(getResources().getString(R.string.japanese), "ja");
-        languageReductions.put(getResources().getString(R.string.turkish), "tr");
-        languageReductions.put(getResources().getString(R.string.indonesian), "id");
-        languageReductions.put(getResources().getString(R.string.hebrew), "he");
-        languageReductions.put(getResources().getString(R.string.latin), "la");
-        languageReductions.put(getResources().getString(R.string.lithuanian), "lt");
-
         mTranslatedTextCardView = (CardView) findViewById(R.id.translatedTextCardView);
 
-        mHistoryManager = new HistoryManager();
-        mLanguagesManager = new LanguagesManager(firstLanguage, secondLanguage, languageReductions);
-
-        reloadUI();
+        clearUI();
 
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -105,21 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
-                offAddToFavoritesButton();
-                textStatusAction(s.toString(), mTranslatedTextCardView.getVisibility() == View.VISIBLE);
-                String request = new NetworkManager(mYandexApiKey,
-                        s.toString(),
-                        mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
-                        mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage())).getTranslateText();
-                mTranslatedText.setText(request);
-                mHistoryManager.setCurrentHistoryElement(new HistoryElement(mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()).toUpperCase(),
-                        mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage()).toUpperCase(),
-                        s.toString(),
-                        request));
-                if ((!request.equals("") || !request.isEmpty())) {
-                    mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
-                }
+                onTextChangedAction(s.toString());
             }
 
             @Override
@@ -127,6 +85,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+    }
+
+    private void onTextChangedAction(String s) {
+        if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
+        offAddToFavoritesButton();
+        textStatusAction(s, mTranslatedTextCardView.getVisibility() == View.VISIBLE);
+        String request = new NetworkManager(MainActivity.this,
+                s,
+                mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
+                mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage())).getTranslatedText();
+        mTranslatedText.setText(request);
+        mHistoryManager.setCurrentHistoryElement(new HistoryElement(mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()).toUpperCase(),
+                mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage()).toUpperCase(),
+                s,
+                request));
+        if ((!request.equals("") || !request.isEmpty())) {
+            mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
+        }
     }
 
     @Override
@@ -156,14 +132,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String buffer = mLanguagesManager.getFirstLanguage();
         mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
         mLanguagesManager.setSecondLanguage(buffer);
-        reloadUI();
+        updateUI();
     }
 
-    public void reloadUI() {
+    public void clearUI() {
         updateUI();
         clearText();
         textStatusAction("", mTranslatedTextCardView.getVisibility() == View.VISIBLE);
-        offAddToFavoritesButton();
     }
 
     private void offAddToFavoritesButton() {
@@ -181,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void updateUI() {
         mFirstLanguageButton.setText(mLanguagesManager.getFirstLanguage());
         mSecondLanguageButton.setText(mLanguagesManager.getSecondLanguage());
+        onTextChangedAction(mInputText.getText().toString());
         updateAddToFavoritesButton();
     }
 
@@ -204,13 +180,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (mLanguagesManager.getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
                         mLanguagesManager.setSecondLanguage(mLanguagesManager.getFirstLanguage());
                     mLanguagesManager.setFirstLanguage(data.getStringExtra("LANGUAGE"));
-                    reloadUI();
+                    clearUI();
                     break;
                 case 2:
                     if (mLanguagesManager.getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
                         mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
                     mLanguagesManager.setSecondLanguage(data.getStringExtra("LANGUAGE"));
-                    reloadUI();
+                    clearUI();
                     break;
                 case 3:
                     mHistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
