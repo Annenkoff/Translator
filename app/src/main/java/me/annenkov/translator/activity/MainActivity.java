@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -82,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
     }
@@ -196,9 +194,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(1, 1, 1, getResources().getString(R.string.favorites));
-        menu.add(1, 2, 2, getResources().getString(R.string.history));
-        menu.add(1, 3, 3, getResources().getString(R.string.about));
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -207,21 +203,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent;
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
-            case 1:
+            case R.id.favorites_menu_item:
                 intent = new Intent(MainActivity.this, HistoryActivity.class);
                 bundle.putBoolean("IS_ONLY_FAVORITES", true);
                 bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 3);
                 break;
-            case 2:
+            case R.id.history_menu_item:
                 intent = new Intent(MainActivity.this, HistoryActivity.class);
                 bundle.putBoolean("IS_ONLY_FAVORITES", false);
                 bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 4);
                 break;
-            case 3:
+            case R.id.about_menu_item:
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 break;
         }
