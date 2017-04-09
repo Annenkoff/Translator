@@ -24,4 +24,5 @@
     <string name="empty_favorites_message">Упс... Вы ничего не добавили в избранное.</string>
     <string name="about">О программе</string>
     <string name="about_description">Вступительная работа в летнюю школу Яндекса.</string>
+    <string name="clear_all">Очистить всё</string>
 </resources>

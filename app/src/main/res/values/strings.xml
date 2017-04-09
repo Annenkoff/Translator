@@ -25,4 +25,5 @@
     <string name="empty_favorites_message">Oops... You don\'t have favorite translations.</string>
     <string name="about">About</string>
     <string name="about_description">Description</string>
+    <string name="clear_all">Clear all</string>
 </resources>

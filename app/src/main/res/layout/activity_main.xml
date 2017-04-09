@@ -52,7 +52,8 @@
         android:layout_alignTop="@id/inputText"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
-        android:src="@drawable/close"/>
+        android:src="@drawable/close"
+        android:visibility="invisible"/>
 
     <ScrollView
         android:layout_width="match_parent"

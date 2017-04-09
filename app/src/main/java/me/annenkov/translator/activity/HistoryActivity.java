@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -78,6 +80,39 @@ public class HistoryActivity extends AppCompatActivity {
         return elements;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_history, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_history_menu_item:
+                if (!isOnlyFavorites) {
+                    mHistoryElements = new ArrayList<>();
+                    applyChanges();
+                } else {
+                    for (HistoryElement historyElement : mHistoryElements) {
+                        historyElement.setFavorite(false);
+                    }
+                    applyChanges();
+                }
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void applyChanges() {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+        intent.putExtras(bundle);
+        setResult(RESULT_OK, intent);
+    }
+
     private class HistoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private HistoryElement mHistoryElement;
         private TextView firstText;
@@ -108,11 +143,7 @@ public class HistoryActivity extends AppCompatActivity {
         public void onClick(View view) {
             mHistoryElement.setFavorite(!mHistoryElement.isFavorite());
             updateFavoriteButton();
-            Intent intent = new Intent();
-            Bundle bundle = new Bundle();
-            bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
-            intent.putExtras(bundle);
-            setResult(RESULT_OK, intent);
+            applyChanges();
         }
 
         private void updateFavoriteButton() {

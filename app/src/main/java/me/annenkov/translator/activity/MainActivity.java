@@ -31,14 +31,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private HistoryManager mHistoryManager;
     private LanguagesManager mLanguagesManager;
 
-    private ImageButton mSwapLanguageButton;
-    private Button mFirstLanguageButton;
-    private Button mSecondLanguageButton;
+    private CardView mTranslatedTextCardView;
+
     private EditText mInputText;
     private TextView mTranslatedText;
+
+    private Button mFirstLanguageButton;
+    private Button mSecondLanguageButton;
+    private ImageButton mSwapLanguageButton;
     private ImageButton mClearText;
     private ImageButton mAddToFavoritesButton;
-    private CardView mTranslatedTextCardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,25 +51,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mHistoryManager = new HistoryManager();
         mLanguagesManager = new LanguagesManager(this);
 
-        mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
-        mSwapLanguageButton.setOnClickListener(this);
+        mTranslatedTextCardView = (CardView) findViewById(R.id.translatedTextCardView);
+
+        mInputText = (EditText) findViewById(R.id.inputText);
+        mTranslatedText = (TextView) findViewById(R.id.translatedText);
 
         mFirstLanguageButton = (Button) findViewById(R.id.firstLanguage);
         mFirstLanguageButton.setOnClickListener(this);
         mSecondLanguageButton = (Button) findViewById(R.id.secondLanguage);
         mSecondLanguageButton.setOnClickListener(this);
-
-        mInputText = (EditText) findViewById(R.id.inputText);
-        mTranslatedText = (TextView) findViewById(R.id.translatedText);
-
+        mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
+        mSwapLanguageButton.setOnClickListener(this);
         mClearText = (ImageButton) findViewById(R.id.clearTextMain);
         mClearText.setOnClickListener(this);
         mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
         mAddToFavoritesButton.setOnClickListener(this);
 
-        mTranslatedTextCardView = (CardView) findViewById(R.id.translatedTextCardView);
-
-        clearUI();
+        updateUI();
 
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void textStatusAction(String text, boolean isShowed) {
-        if (!text.isEmpty() && !isShowed) textNotEmptyAction();
-        else if (text.isEmpty() && isShowed) textEmptyAction();
+        if ((!text.isEmpty() || !text.equals("")) && !isShowed) textNotEmptyAction();
+        else if ((text.isEmpty() || text.equals("")) && isShowed) textEmptyAction();
     }
 
     public void textNotEmptyAction() {
@@ -133,12 +133,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
         mLanguagesManager.setSecondLanguage(buffer);
         updateUI();
-    }
-
-    public void clearUI() {
-        updateUI();
-        clearText();
-        textStatusAction("", mTranslatedTextCardView.getVisibility() == View.VISIBLE);
     }
 
     private void offAddToFavoritesButton() {
@@ -167,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 offAddToFavoritesButton();
             }
-        } catch (NullPointerException e) {
+        } catch (NullPointerException ignored) {
         }
     }
 
@@ -180,13 +174,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (mLanguagesManager.getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
                         mLanguagesManager.setSecondLanguage(mLanguagesManager.getFirstLanguage());
                     mLanguagesManager.setFirstLanguage(data.getStringExtra("LANGUAGE"));
-                    clearUI();
+                    updateUI();
                     break;
                 case 2:
                     if (mLanguagesManager.getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
                         mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
                     mLanguagesManager.setSecondLanguage(data.getStringExtra("LANGUAGE"));
-                    clearUI();
+                    updateUI();
                     break;
                 case 3:
                     mHistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
@@ -210,25 +204,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+        Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case 1:
-                Intent firstIntent = new Intent(MainActivity.this, HistoryActivity.class);
-                Bundle firstBundle = new Bundle();
-                firstBundle.putBoolean("IS_ONLY_FAVORITES", true);
-                firstBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
-                firstIntent.putExtras(firstBundle);
-                startActivityForResult(firstIntent, 3);
+                bundle.putBoolean("IS_ONLY_FAVORITES", true);
+                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 3);
                 break;
             case 2:
-                Intent secondIntent = new Intent(MainActivity.this, HistoryActivity.class);
-                Bundle secondBundle = new Bundle();
-                secondBundle.putBoolean("IS_ONLY_FAVORITES", false);
-                secondBundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
-                secondIntent.putExtras(secondBundle);
-                startActivityForResult(secondIntent, 4);
+                bundle.putBoolean("IS_ONLY_FAVORITES", false);
+                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 4);
                 break;
             case 3:
-                startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                startActivity(intent);
                 break;
         }
         return super.onOptionsItemSelected(item);
