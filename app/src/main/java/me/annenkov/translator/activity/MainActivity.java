@@ -204,23 +204,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+        Intent intent;
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case 1:
+                intent = new Intent(MainActivity.this, HistoryActivity.class);
                 bundle.putBoolean("IS_ONLY_FAVORITES", true);
                 bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 3);
                 break;
             case 2:
+                intent = new Intent(MainActivity.this, HistoryActivity.class);
                 bundle.putBoolean("IS_ONLY_FAVORITES", false);
                 bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 4);
                 break;
             case 3:
-                startActivity(intent);
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
