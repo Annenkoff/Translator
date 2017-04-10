@@ -115,11 +115,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage())).getTranslatedText();
         mTranslatedText.setText(request);
-        mHistoryManager.setCurrentHistoryElement(new HistoryElement(mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()).toUpperCase(),
+        HistoryElement historyElement = new HistoryElement(mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()).toUpperCase(),
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage()).toUpperCase(),
                 s,
-                request));
-        if ((!request.equals("") || !request.isEmpty())) {
+                request);
+        mHistoryManager.setCurrentHistoryElement(historyElement);
+        if (((!request.equals("") || !request.isEmpty())) && !mHistoryManager.getFirstHistoryElement().equals(historyElement)) {
             mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
         }
     }

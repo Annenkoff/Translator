@@ -45,7 +45,11 @@ public class HistoryManager {
     }
 
     public HistoryElement getFirstHistoryElement() {
-        return HistoryElement.last(HistoryElement.class);
+        if (HistoryElement.last(HistoryElement.class) != null) {
+            return HistoryElement.last(HistoryElement.class);
+        } else {
+            return new HistoryElement("", "", "", "");
+        }
     }
 
     public void cancelTimer() {
