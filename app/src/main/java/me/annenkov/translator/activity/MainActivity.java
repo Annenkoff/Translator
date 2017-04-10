@@ -1,10 +1,12 @@
 package me.annenkov.translator.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -14,12 +16,16 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.orm.SugarContext;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import me.annenkov.translator.R;
 import me.annenkov.translator.manager.HistoryManager;
@@ -28,10 +34,12 @@ import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.model.HistoryElement;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    Timer mTimer;
+
     private HistoryManager mHistoryManager;
     private LanguagesManager mLanguagesManager;
 
-    private CardView mTranslatedTextCardView;
+    private ScrollView mTranslatedTextScrollView;
 
     private EditText mInputText;
     private TextView mTranslatedText;
@@ -39,8 +47,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mFirstLanguageButton;
     private Button mSecondLanguageButton;
     private ImageButton mSwapLanguageButton;
-    private ImageButton mClearText;
+    private ImageButton mClearTextButton;
     private ImageButton mAddToFavoritesButton;
+    private ImageButton mCopyTextButton;
+    private ImageButton mShareButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mHistoryManager = new HistoryManager();
         mLanguagesManager = new LanguagesManager(this);
 
-        mTranslatedTextCardView = (CardView) findViewById(R.id.translatedTextCardView);
+        mTranslatedTextScrollView = (ScrollView) findViewById(R.id.translatedTextScrollView);
 
         mInputText = (EditText) findViewById(R.id.inputText);
         mTranslatedText = (TextView) findViewById(R.id.translatedText);
@@ -62,10 +72,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSecondLanguageButton.setOnClickListener(this);
         mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
         mSwapLanguageButton.setOnClickListener(this);
-        mClearText = (ImageButton) findViewById(R.id.clearTextMain);
-        mClearText.setOnClickListener(this);
+        mClearTextButton = (ImageButton) findViewById(R.id.clearTextMain);
+        mClearTextButton.setOnClickListener(this);
         mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
         mAddToFavoritesButton.setOnClickListener(this);
+        mCopyTextButton = (ImageButton) findViewById(R.id.copyTextButtonMenu);
+        mCopyTextButton.setOnClickListener(this);
+        mShareButton = (ImageButton) findViewById(R.id.shareButtonMenu);
+        mShareButton.setOnClickListener(this);
 
         updateUI();
 
@@ -76,7 +90,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                onTextChangedAction(s.toString());
+                if (mTimer != null) mTimer.cancel();
+                if (mHistoryManager.getTimer() != null) mHistoryManager.getTimer().cancel();
+                if (s.length() == 0) {
+                    onTextChangedAction(s.toString());
+                    return;
+                }
+                mTimer = new Timer(true);
+                mTimer.schedule(new TranslateTimer(s.toString()), 400);
             }
 
             @Override
@@ -88,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void onTextChangedAction(String s) {
         if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
         offAddToFavoritesButton();
-        textStatusAction(s, mTranslatedTextCardView.getVisibility() == View.VISIBLE);
+        textStatusAction(s, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
         String request = new NetworkManager(MainActivity.this,
                 s,
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
@@ -115,15 +136,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void textNotEmptyAction() {
-        mTranslatedTextCardView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.show_element));
-        mClearText.setVisibility(View.VISIBLE);
-        mTranslatedTextCardView.setVisibility(View.VISIBLE);
+        mTranslatedTextScrollView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.show_element));
+        mClearTextButton.setVisibility(View.VISIBLE);
+        mTranslatedTextScrollView.setVisibility(View.VISIBLE);
     }
 
     public void textEmptyAction() {
-        mTranslatedTextCardView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.hide_element));
-        mClearText.setVisibility(View.INVISIBLE);
-        mTranslatedTextCardView.setVisibility(View.INVISIBLE);
+        mTranslatedTextScrollView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.hide_element));
+        mClearTextButton.setVisibility(View.INVISIBLE);
+        mTranslatedTextScrollView.setVisibility(View.INVISIBLE);
     }
 
     public void swapLanguages() {
@@ -257,6 +278,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 updateAddToFavoritesButton();
                 break;
+            case R.id.copyTextButtonMenu:
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Text", mTranslatedText.getText());
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, getString(R.string.text_copied), Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.shareButtonMenu:
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, mTranslatedText.getText());
+                startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
+                break;
+        }
+    }
+
+    private class TranslateTimer extends TimerTask {
+        private String mNotTranslatedText;
+
+        public TranslateTimer(String notTranslatedText) {
+            mNotTranslatedText = notTranslatedText;
+        }
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onTextChangedAction(mNotTranslatedText);
+                }
+            });
         }
     }
 }

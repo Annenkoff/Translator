@@ -25,4 +25,6 @@
     <string name="about">О программе</string>
     <string name="about_description">Вступительная работа в летнюю школу Яндекса.</string>
     <string name="clear_all">Очистить всё</string>
+    <string name="text_copied">Текст скопирован</string>
+    <string name="share_via">Поделиться через</string>
 </resources>

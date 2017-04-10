@@ -26,4 +26,6 @@
     <string name="about">About</string>
     <string name="about_description">for Yandex \"Mobilization\"</string>
     <string name="clear_all">Clear all</string>
+    <string name="text_copied">The text was copied</string>
+    <string name="share_via">Share via</string>
 </resources>
