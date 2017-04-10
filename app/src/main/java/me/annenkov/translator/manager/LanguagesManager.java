@@ -48,6 +48,13 @@ public class LanguagesManager {
         mFirstLanguage = firstLanguage;
     }
 
+    public String getLanguageFromLanguageReduction(String languageReduction) {
+        for (String s : mLanguageReductions.keySet()) {
+            if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
+        }
+        return null;
+    }
+
     public String getSecondLanguage() {
         return mSecondLanguage;
     }

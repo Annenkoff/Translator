@@ -113,6 +113,17 @@ public class HistoryActivity extends AppCompatActivity {
         setResult(RESULT_OK, intent);
     }
 
+    private void applyChanges(String text, String firstLanguageReduction, String secondLanguageReduction) {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+        bundle.putString("TEXT_TO_TRANSLATE", text);
+        bundle.putString("FIRST_LANGUAGE", firstLanguageReduction);
+        bundle.putString("SECOND_LANGUAGE", secondLanguageReduction);
+        intent.putExtras(bundle);
+        setResult(RESULT_OK, intent);
+    }
+
     private class HistoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private HistoryElement mHistoryElement;
         private TextView firstText;
@@ -159,7 +170,16 @@ public class HistoryActivity extends AppCompatActivity {
         @Override
         public HistoryActivity.HistoryHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_history_element, parent, false);
-            return new HistoryActivity.HistoryHolder(view);
+            final HistoryHolder historyHolder = new HistoryActivity.HistoryHolder(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String twoLanguagesReductions = historyHolder.twoLanguageReductions.getText().toString();
+                    applyChanges(historyHolder.firstText.getText().toString(), twoLanguagesReductions.split("-")[0], twoLanguagesReductions.split("-")[1]);
+                    finish();
+                }
+            });
+            return historyHolder;
         }
 
         @Override

@@ -203,9 +203,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case 3:
                     mHistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
+                    if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
+                        mFirstLanguageButton.setText(mLanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("FIRST_LANGUAGE")));
+                        mSecondLanguageButton.setText(mLanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("SECOND_LANGUAGE")));
+                        mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
+                    }
                     break;
                 case 4:
                     mHistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
+                    if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
+                        mFirstLanguageButton.setText(mLanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("FIRST_LANGUAGE")));
+                        mSecondLanguageButton.setText(mLanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("SECOND_LANGUAGE")));
+                        mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
+                    }
                     break;
             }
         } catch (NullPointerException e) {
@@ -296,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private class TranslateTimer extends TimerTask {
         private String mNotTranslatedText;
 
-        public TranslateTimer(String notTranslatedText) {
+        TranslateTimer(String notTranslatedText) {
             mNotTranslatedText = notTranslatedText;
         }
 

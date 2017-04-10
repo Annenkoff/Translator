@@ -48,10 +48,6 @@ public class HistoryManager {
         return HistoryElement.last(HistoryElement.class);
     }
 
-    public int getHistoryElementsSize() {
-        return HistoryElement.listAll(HistoryElement.class).size();
-    }
-
     public void cancelTimer() {
         mTimer.cancel();
     }
@@ -62,20 +58,6 @@ public class HistoryManager {
 
     public void setCurrentHistoryElement(HistoryElement currentHistoryElement) {
         mCurrentHistoryElement = currentHistoryElement;
-    }
-
-    public boolean isElementInHistory(HistoryElement historyElement) {
-        return getElementInHistory(historyElement) != null;
-    }
-
-    public HistoryElement getElementInHistory(HistoryElement historyElement) {
-        List<HistoryElement> historyElements = HistoryElement.listAll(HistoryElement.class);
-        for (HistoryElement historyElementInList : historyElements) {
-            if (historyElementInList.equals(historyElement)) {
-                return historyElementInList;
-            }
-        }
-        return null;
     }
 
     public Integer getElementInHistoryIndex(HistoryElement historyElement) {
