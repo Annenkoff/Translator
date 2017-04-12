@@ -4,30 +4,40 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/app_description_about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:gravity="center"
-        android:text="@string/about_description"
-        android:textSize="24sp"/>
+    <include
+        android:id="@+id/toolbar_about"
+        layout="@layout/toolbar_simple"/>
 
-    <TextView
-        android:id="@+id/app_name_about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/app_description_about"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="@string/app_name"
-        android:textSize="38sp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_about">
 
-    <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_above="@id/app_name_about"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/book_open_page_variant"/>
+        <TextView
+            android:id="@+id/app_description_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/about_description"
+            android:textSize="24sp"/>
+
+        <TextView
+            android:id="@+id/app_name_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/app_description_about"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textSize="38sp"/>
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_above="@id/app_name_about"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/book_open_page_variant"/>
+    </RelativeLayout>
 </RelativeLayout>

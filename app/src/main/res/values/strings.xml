@@ -28,4 +28,7 @@
     <string name="clear_all">Clear all</string>
     <string name="text_copied">The text was copied</string>
     <string name="share_via">Share via</string>
+    <string name="main_page">Main page</string>
+    <string name="history_cleared_toast">History was cleared</string>
+    <string name="favorites_cleared_toast">Favorites was cleared</string>
 </resources>

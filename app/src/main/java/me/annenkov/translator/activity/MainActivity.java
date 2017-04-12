@@ -1,18 +1,21 @@
 package me.annenkov.translator.activity;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,6 +23,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.orm.SugarContext;
 
 import java.util.ArrayList;
@@ -33,9 +42,11 @@ import me.annenkov.translator.manager.LanguagesManager;
 import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.model.HistoryElement;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Timer mTimer;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerListener, Drawer.OnDrawerItemClickListener {
+    private Toolbar mToolbar;
+    private Drawer mDrawer;
 
+    private Timer mTimer;
     private HistoryManager mHistoryManager;
     private LanguagesManager mLanguagesManager;
 
@@ -57,6 +68,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SugarContext.init(this);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        initToolbar();
+        mDrawer = new DrawerBuilder()
+                .withActivity(this)
+                .withHeader(R.layout.drawer_header)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName(R.string.main_page).withIcon(R.drawable.home).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.favorites).withIcon(R.drawable.bookmark_black).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.history).withIcon(R.drawable.history).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.about).withIcon(R.drawable.information).withSelectable(false),
+                        new DividerDrawerItem(),
+                        new SecondaryDrawerItem().withName("GitHub").withIcon(R.drawable.github_circle).withSelectable(false)
+                )
+                .withOnDrawerListener(this)
+                .withOnDrawerItemClickListener(this)
+                .build();
 
         mHistoryManager = new HistoryManager();
         mLanguagesManager = new LanguagesManager(this);
@@ -97,13 +125,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 mTimer = new Timer(true);
-                mTimer.schedule(new TranslateTimer(s.toString()), 400);
+                mTimer.schedule(new TranslateTimer(s.toString()), 500);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
+    }
+
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.menu));
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawer.openDrawer();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawer.isDrawerOpen()) {
+            mDrawer.closeDrawer();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void onTextChangedAction(String s) {
@@ -225,39 +275,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
-        Bundle bundle = new Bundle();
-        switch (item.getItemId()) {
-            case R.id.favorites_menu_item:
-                intent = new Intent(MainActivity.this, HistoryActivity.class);
-                bundle.putBoolean("IS_ONLY_FAVORITES", true);
-                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 3);
-                break;
-            case R.id.history_menu_item:
-                intent = new Intent(MainActivity.this, HistoryActivity.class);
-                bundle.putBoolean("IS_ONLY_FAVORITES", false);
-                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 4);
-                break;
-            case R.id.about_menu_item:
-                startActivity(new Intent(MainActivity.this, AboutActivity.class));
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.swapLanguage:
@@ -302,6 +319,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(Intent.createChooser(sharingIntent, getString(R.string.share_via)));
                 break;
         }
+    }
+
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        InputMethodManager inputMethodManager = (InputMethodManager) MainActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(MainActivity.this.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    @Override
+    public void onDrawerClosed(View drawerView) {
+
+    }
+
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+
+    }
+
+    @Override
+    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+        Intent intent;
+        Bundle bundle = new Bundle();
+        switch (position) {
+            case 2:
+                intent = new Intent(MainActivity.this, HistoryActivity.class);
+                bundle.putBoolean("IS_ONLY_FAVORITES", true);
+                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 3);
+                break;
+            case 3:
+                intent = new Intent(MainActivity.this, HistoryActivity.class);
+                bundle.putBoolean("IS_ONLY_FAVORITES", false);
+                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) mHistoryManager.getHistoryElements());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 4);
+                break;
+            case 4:
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                break;
+            case 6:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/annenkoff/Translator"));
+                startActivity(browserIntent);
+                break;
+        }
+        return false;
     }
 
     private class TranslateTimer extends TimerTask {

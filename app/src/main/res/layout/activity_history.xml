@@ -4,32 +4,42 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view_history"
+    <include
+        android:id="@+id/toolbar_history"
+        layout="@layout/toolbar_history"/>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"/>
+        android:layout_below="@id/toolbar_history">
 
-    <LinearLayout
-        android:id="@+id/empty_history_backgroung_notification"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical"
-        android:visibility="invisible">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"/>
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center_horizontal"
-            android:scaleType="fitXY"
-            android:src="@drawable/sleep"/>
-
-        <TextView
-            android:id="@+id/empty_history_backgroung_notification_textview"
+        <LinearLayout
+            android:id="@+id/empty_history_backgroung_notification"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="invisible">
 
-    </LinearLayout>
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="fitXY"
+                android:src="@drawable/sleep"/>
+
+            <TextView
+                android:id="@+id/empty_history_backgroung_notification_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -5,114 +5,124 @@
                 android:layout_height="match_parent"
                 tools:context="me.annenkov.translator.activity.MainActivity">
 
-    <ImageButton
-        android:id="@+id/swapLanguage"
-        style="@style/Base.Widget.AppCompat.Button.Borderless"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/swap_horizontal"/>
+    <include
+        android:id="@+id/toolbar_main"
+        layout="@layout/toolbar_main"/>
 
-    <Button
-        android:id="@+id/firstLanguage"
-        style="@style/Base.Widget.AppCompat.Button.Borderless"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/swapLanguage"/>
-
-    <Button
-        android:id="@+id/secondLanguage"
-        style="@style/Base.Widget.AppCompat.Button.Borderless"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/swapLanguage"/>
-
-    <EditText
-        android:id="@+id/inputText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/swapLanguage"
-        android:layout_centerHorizontal="true"
-        android:hint="@string/type_text_for_translation"
-        android:inputType="textMultiLine"
-        android:maxHeight="150dp"
-        android:minHeight="150dp"
-        android:padding="10dp"
-        android:textSize="22sp"/>
-
-    <ImageButton
-        android:id="@+id/clearTextMain"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_alignRight="@id/inputText"
-        android:layout_alignTop="@id/inputText"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/close"
-        android:visibility="invisible"/>
-
-    <ScrollView
-        android:id="@+id/translatedTextScrollView"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/inputText"
-        android:visibility="invisible">
+        android:layout_below="@id/toolbar_main">
 
-        <android.support.v7.widget.CardView
-            style="@style/TranslatedTextCardViewStyle"
+        <ImageButton
+            android:id="@+id/swapLanguage"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/swap_horizontal"/>
+
+        <Button
+            android:id="@+id/firstLanguage"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@id/swapLanguage"/>
+
+        <Button
+            android:id="@+id/secondLanguage"
+            style="@style/Base.Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@id/swapLanguage"/>
+
+        <EditText
+            android:id="@+id/inputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_below="@id/swapLanguage"
+            android:layout_centerHorizontal="true"
+            android:hint="@string/type_text_for_translation"
+            android:inputType="textMultiLine"
+            android:maxHeight="150dp"
             android:minHeight="150dp"
-            android:scrollbars="vertical">
+            android:padding="10dp"
+            android:textSize="22sp"/>
 
-            <TextView
-                android:id="@+id/translatedText"
+        <ImageButton
+            android:id="@+id/clearTextMain"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignRight="@id/inputText"
+            android:layout_alignTop="@id/inputText"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/close"
+            android:visibility="invisible"/>
+
+        <ScrollView
+            android:id="@+id/translatedTextScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/inputText"
+            android:visibility="invisible">
+
+            <android.support.v7.widget.CardView
+                style="@style/TranslatedTextCardViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/inputText"
-                android:layout_centerHorizontal="true"
-                android:layout_margin="30dp"
-                android:textColor="@color/white"
-                android:textSize="22sp"/>
+                android:layout_margin="10dp"
+                android:minHeight="150dp"
+                android:scrollbars="vertical">
 
-            <ImageButton
-                android:id="@+id/addToFavoritesButtonMain"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="top|right"
-                android:layout_margin="7dp"
-                android:src="@drawable/bookmark_outline_white"/>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_margin="7dp"
-                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/translatedText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/inputText"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="30dp"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"/>
 
                 <ImageButton
-                    android:id="@+id/shareButtonMenu"
+                    android:id="@+id/addToFavoritesButtonMain"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_gravity="bottom"
-                    android:layout_marginRight="6dp"
-                    android:src="@drawable/share_variant"/>
+                    android:layout_gravity="top|right"
+                    android:layout_margin="7dp"
+                    android:src="@drawable/bookmark_outline_white"/>
 
-                <ImageButton
-                    android:id="@+id/copyTextButtonMenu"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginLeft="6dp"
-                    android:src="@drawable/content_copy"/>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-    </ScrollView>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|right"
+                    android:layout_margin="7dp"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/shareButtonMenu"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginRight="6dp"
+                        android:src="@drawable/share_variant"/>
+
+                    <ImageButton
+                        android:id="@+id/copyTextButtonMenu"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="6dp"
+                        android:src="@drawable/content_copy"/>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </ScrollView>
+    </RelativeLayout>
 </RelativeLayout>

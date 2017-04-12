@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,8 @@ import me.annenkov.translator.R;
 import me.annenkov.translator.model.HistoryElement;
 
 public class HistoryActivity extends AppCompatActivity {
+    private Toolbar mToolbar;
+
     private RecyclerView mRecyclerView;
     private HistoryActivity.HistoryAdapter mAdapter;
     private TextView mEmptyHistoryBackgroundNotificationTextView;
@@ -37,6 +42,9 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_history);
+        initToolbar();
+
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_history);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -47,6 +55,19 @@ public class HistoryActivity extends AppCompatActivity {
         isOnlyFavorites = getIntent().getBooleanExtra("IS_ONLY_FAVORITES", false);
 
         updateUI();
+    }
+
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.keyboard_backspace));
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void updateUI() {
@@ -92,13 +113,14 @@ public class HistoryActivity extends AppCompatActivity {
             case R.id.clear_history_menu_item:
                 if (!isOnlyFavorites) {
                     mHistoryElements = new ArrayList<>();
-                    applyChanges();
+                    Toast.makeText(this, R.string.history_cleared_toast, Toast.LENGTH_SHORT).show();
                 } else {
                     for (HistoryElement historyElement : mHistoryElements) {
                         historyElement.setFavorite(false);
                     }
-                    applyChanges();
+                    Toast.makeText(this, R.string.favorites_cleared_toast, Toast.LENGTH_SHORT).show();
                 }
+                applyChanges();
                 finish();
                 break;
         }
