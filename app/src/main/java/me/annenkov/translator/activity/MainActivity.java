@@ -36,6 +36,7 @@ import java.util.List;
 
 import me.annenkov.translator.R;
 import me.annenkov.translator.Utils;
+import me.annenkov.translator.manager.CacheManager;
 import me.annenkov.translator.manager.HistoryManager;
 import me.annenkov.translator.manager.LanguagesManager;
 import me.annenkov.translator.manager.NetworkManager;
@@ -190,10 +191,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (TimerManager.getAddHistoryElementTimer() != null)
             TimerManager.cancelAddHistoryElementTimer();
         offAddToFavoritesButton();
-        String secondText = new NetworkManager(MainActivity.this,
-                firstText,
-                LanguagesManager.getLanguageReductions().get(LanguagesManager.getFirstLanguage()),
-                LanguagesManager.getLanguageReductions().get(LanguagesManager.getSecondLanguage())).getTranslatedText();
+        String secondText = CacheManager
+                .getTranslationFromText(LanguagesManager.getFirstLanguageReduction(), firstText);
+        if (secondText == null) {
+            secondText = new NetworkManager(MainActivity.this,
+                    firstText,
+                    LanguagesManager.getLanguageReductions().get(LanguagesManager.getFirstLanguage()),
+                    LanguagesManager.getLanguageReductions().get(LanguagesManager.getSecondLanguage())).getTranslatedText();
+            CacheManager.addToCache(LanguagesManager.getFirstLanguageReduction(),
+                    firstText, secondText);
+        }
         mTranslatedText.setText(secondText);
         textStatusAction(firstText, secondText, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
         HistoryElement historyElement = new HistoryElement(LanguagesManager.getLanguageReductions().get(LanguagesManager.getFirstLanguage()).toUpperCase(),
@@ -298,16 +305,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case 3:
                     HistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
                     if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
-                        mFirstLanguageButton.setText(LanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("FIRST_LANGUAGE")));
-                        mSecondLanguageButton.setText(LanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("SECOND_LANGUAGE")));
+                        mFirstLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
+                        mSecondLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
                         mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
                     }
                     break;
                 case 4:
                     HistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
                     if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
-                        mFirstLanguageButton.setText(LanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("FIRST_LANGUAGE")));
-                        mSecondLanguageButton.setText(LanguagesManager.getLanguageFromLanguageReduction(data.getStringExtra("SECOND_LANGUAGE")));
+                        mFirstLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
+                        mSecondLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
                         mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
                     }
                     break;

@@ -49,11 +49,8 @@ public class LanguagesManager {
         mFirstLanguage = firstLanguage;
     }
 
-    public static String getLanguageFromLanguageReduction(String languageReduction) {
-        for (String s : mLanguageReductions.keySet()) {
-            if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
-        }
-        return "";
+    public static String getFirstLanguageReduction() {
+        return getLanguageReduction(mFirstLanguage);
     }
 
     public static String getSecondLanguage() {
@@ -63,6 +60,21 @@ public class LanguagesManager {
     public static void setSecondLanguage(String secondLanguage) {
         if (getFirstLanguage().equals(secondLanguage)) mFirstLanguage = mSecondLanguage;
         mSecondLanguage = secondLanguage;
+    }
+
+    public static String getSecondLanguageReduction() {
+        return getLanguageReduction(mSecondLanguage);
+    }
+
+    public static String getLanguage(String languageReduction) {
+        for (String s : mLanguageReductions.keySet()) {
+            if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
+        }
+        return "";
+    }
+
+    public static String getLanguageReduction(String language) {
+        return mLanguageReductions.get(language);
     }
 
     public static Map<String, String> getLanguageReductions() {
@@ -81,7 +93,7 @@ public class LanguagesManager {
     }
 
     public String getRightLanguage(String text) {
-        return getLanguageFromLanguageReduction(getRightLanguageReduction(text));
+        return getLanguage(getRightLanguageReduction(text));
     }
 
     public boolean isFirstLanguageIsRight(String text) {
