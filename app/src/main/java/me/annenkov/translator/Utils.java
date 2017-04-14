@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.view.inputmethod.InputMethodManager;
 
+/**
+ * Класс с утилитами, которые мешались в Activity.
+ */
 public class Utils {
     private Activity mActivity;
 

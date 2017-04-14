@@ -8,6 +8,14 @@ import java.util.TimerTask;
 import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.model.HistoryElement;
 
+/**
+ * Класс для работы с таймером.
+ * Используется два разных таймера для перевода и
+ * добавления в историю. Сделано для того, чтобы
+ * в историю не добавлялись лишние "промежуточные"
+ * элементы. Таким образом, перевод происходит быстро,
+ * а заспамливания истории почти не происходит.
+ */
 public class TimerManager {
     private static Timer sAddHistoryElementTimer;
     private static Timer sTranslateTimer;
@@ -28,14 +36,25 @@ public class TimerManager {
         sTranslateTimer.cancel();
     }
 
-    public static void startAddHistoryElementTimer(HistoryElement historyElement, long delay) {
+    /**
+     * Откладывает добавление элемента в историю.
+     *
+     * @param historyElement Элемент, который добавляется в историю.
+     */
+    public static void startAddHistoryElementTimer(HistoryElement historyElement) {
         sAddHistoryElementTimer = new Timer(true);
-        sAddHistoryElementTimer.schedule(new TimerTaskToAddHistoryElement(historyElement), delay);
+        sAddHistoryElementTimer.schedule(new TimerTaskToAddHistoryElement(historyElement), 1650);
     }
 
-    public static void startTranslateTimer(final Activity activity, String notTranslatedText, long delay) {
+    /**
+     * Откладывает перевод на определённое время.
+     *
+     * @param activity  Активити, для выполнения runOnUiThread.
+     * @param firstText Ещё не переведённый текст.
+     */
+    public static void startTranslateTimer(final Activity activity, String firstText) {
         sTranslateTimer = new Timer(true);
-        sTranslateTimer.schedule(new TranslateTimer(activity, notTranslatedText), delay);
+        sTranslateTimer.schedule(new TranslateTimer(activity, firstText), 650);
     }
 
     private static class TimerTaskToAddHistoryElement extends java.util.TimerTask {

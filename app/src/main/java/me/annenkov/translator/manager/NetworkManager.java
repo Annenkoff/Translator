@@ -16,6 +16,9 @@ import java.util.concurrent.ExecutionException;
 
 import me.annenkov.translator.R;
 
+/**
+ * Класс для работы с сетью и API.
+ */
 public class NetworkManager {
     private Context mContext;
     private String mYandexApiKey;
@@ -48,9 +51,14 @@ public class NetworkManager {
         }
     }
 
-    public String getFirstLanguageReduction() {
+    /**
+     * Получение "правильного" сокращения языка.
+     * <p>
+     * Помогает работать системе по рекомендации языка.
+     */
+    public String getRightLanguageReduction() {
         try {
-            return new AsyncRequestToGetFirstLanguageReduction().execute(mYandexApiKey, mText).get();
+            return new AsyncRequestToGetRightLanguageReduction().execute(mYandexApiKey, mText).get();
         } catch (InterruptedException | ExecutionException e) {
             return "";
         }
@@ -77,7 +85,7 @@ public class NetworkManager {
         }
     }
 
-    private class AsyncRequestToGetFirstLanguageReduction extends AsyncTask<String, Integer, String> {
+    private class AsyncRequestToGetRightLanguageReduction extends AsyncTask<String, Integer, String> {
         @Override
         protected String doInBackground(String... arg) {
             try {

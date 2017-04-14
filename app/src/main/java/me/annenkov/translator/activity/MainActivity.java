@@ -43,6 +43,10 @@ import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.manager.TimerManager;
 import me.annenkov.translator.model.HistoryElement;
 
+/**
+ * Главный Activity. Точка входа в приложение.
+ * Представляет экран для перевода.
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerListener, Drawer.OnDrawerItemClickListener {
     private View mDim;
 
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     onTextChangedAction(s.toString());
                     return;
                 }
-                TimerManager.startTranslateTimer(MainActivity.this, s.toString(), 650);
+                TimerManager.startTranslateTimer(MainActivity.this, s.toString());
             }
 
             @Override
@@ -209,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 secondText);
         HistoryManager.setCurrentHistoryElement(historyElement);
         if (((!secondText.equals("") || !secondText.isEmpty())) && !HistoryManager.getFirstHistoryElement().equals(historyElement)) {
-            HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement(), 1650);
+            HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement());
         }
         if (!mLanguagesManager.isFirstLanguageIsRight(firstText)) {
             final String rightLanguage = mLanguagesManager.getRightLanguage(firstText);

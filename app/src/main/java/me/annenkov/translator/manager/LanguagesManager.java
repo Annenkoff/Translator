@@ -10,6 +10,13 @@ import java.util.Map;
 
 import me.annenkov.translator.R;
 
+/**
+ * Класс для работы с языками.
+ * Хранит в себе два текущих языка - "первый" и "второй".
+ * Понятия "первый" и "второй" используются для упрощения.
+ * "первый" - язык, с которого требуется перевести.
+ * "второй" - язык, на который требуется перевести.
+ */
 public class LanguagesManager {
     private static String mFirstLanguage;
     private static String mSecondLanguage;
@@ -66,6 +73,12 @@ public class LanguagesManager {
         return getLanguageReduction(mSecondLanguage);
     }
 
+    /**
+     * Получение названия языка по его сокращению.
+     * Пример: en - english.
+     *
+     * @param languageReduction Сокращение языка.
+     */
     public static String getLanguage(String languageReduction) {
         for (String s : mLanguageReductions.keySet()) {
             if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
@@ -89,7 +102,7 @@ public class LanguagesManager {
     }
 
     public String getRightLanguageReduction(String text) {
-        return new NetworkManager(mContext, text).getFirstLanguageReduction();
+        return new NetworkManager(mContext, text).getRightLanguageReduction();
     }
 
     public String getRightLanguage(String text) {

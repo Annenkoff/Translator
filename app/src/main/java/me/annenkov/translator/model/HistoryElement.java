@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import com.orm.SugarRecord;
 
+/**
+ * DAO класс для хранения информации одного элемента истории.
+ */
 public class HistoryElement extends SugarRecord implements Parcelable {
     public static final Creator<HistoryElement> CREATOR = new Creator<HistoryElement>() {
         @Override
