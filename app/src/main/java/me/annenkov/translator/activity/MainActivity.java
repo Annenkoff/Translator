@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 mTimer = new Timer(true);
-                mTimer.schedule(new TranslateTimer(s.toString()), 500);
+                mTimer.schedule(new TranslateTimer(s.toString()), 650);
             }
 
             @Override
@@ -193,31 +193,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void onTextChangedAction(final String s) {
+    private void onTextChangedAction(final String firstText) {
         if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
         offAddToFavoritesButton();
-        textStatusAction(s, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
-        String request = new NetworkManager(MainActivity.this,
-                s,
+        String secondText = new NetworkManager(MainActivity.this,
+                firstText,
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()),
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage())).getTranslatedText();
-        mTranslatedText.setText(request);
+        mTranslatedText.setText(secondText);
+        textStatusAction(firstText, secondText, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
         HistoryElement historyElement = new HistoryElement(mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getFirstLanguage()).toUpperCase(),
                 mLanguagesManager.getLanguageReductions().get(mLanguagesManager.getSecondLanguage()).toUpperCase(),
-                s,
-                request);
+                firstText,
+                secondText);
         mHistoryManager.setCurrentHistoryElement(historyElement);
-        if (((!request.equals("") || !request.isEmpty())) && !mHistoryManager.getFirstHistoryElement().equals(historyElement)) {
+        if (((!secondText.equals("") || !secondText.isEmpty())) && !mHistoryManager.getFirstHistoryElement().equals(historyElement)) {
             mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
         }
-        if (!mLanguagesManager.isFirstLanguageIsRight(s)) {
-            final String rightLanguage = mLanguagesManager.getRightLanguage(s);
+        if (!mLanguagesManager.isFirstLanguageIsRight(firstText)) {
+            final String rightLanguage = mLanguagesManager.getRightLanguage(firstText);
             mRightLanguageButton.setText(getString(R.string.set) + " " + rightLanguage);
             mRecommendationFloatButton.show();
             mRightLanguageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mLanguagesManager.makeFirstLanguageRight(s);
+                    mLanguagesManager.makeFirstLanguageRight(firstText);
                     updateUI();
                     mSlide.hide();
                     mRecommendationFloatButton.hide();
@@ -232,21 +232,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SugarContext.terminate();
     }
 
-    public void textStatusAction(String text, boolean isShowed) {
-        if ((!text.isEmpty() || !text.equals("")) && !isShowed) textNotEmptyAction();
-        else if ((text.isEmpty() || text.equals("")) && isShowed) textEmptyAction();
+    public void textStatusAction(String firstText, String secondText, boolean isShowed) {
+        if (!firstText.isEmpty() && !secondText.isEmpty() && !isShowed) textNotEmptyAction();
+        else if (firstText.isEmpty() && secondText.isEmpty() && isShowed) textEmptyAction();
+        else if (!firstText.isEmpty()) mClearTextButton.setVisibility(View.VISIBLE);
+        else if (firstText.isEmpty()) mClearTextButton.setVisibility(View.INVISIBLE);
     }
 
     public void textNotEmptyAction() {
         mTranslatedTextScrollView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.show_element));
-        mClearTextButton.setVisibility(View.VISIBLE);
         mTranslatedTextScrollView.setVisibility(View.VISIBLE);
+        mClearTextButton.setVisibility(View.VISIBLE);
     }
 
     public void textEmptyAction() {
         mTranslatedTextScrollView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.hide_element));
-        mClearTextButton.setVisibility(View.INVISIBLE);
         mTranslatedTextScrollView.setVisibility(View.INVISIBLE);
+        mClearTextButton.setVisibility(View.INVISIBLE);
     }
 
     public void swapLanguages() {
