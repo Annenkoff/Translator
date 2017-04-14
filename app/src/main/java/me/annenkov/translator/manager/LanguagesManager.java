@@ -11,10 +11,10 @@ import java.util.Map;
 import me.annenkov.translator.R;
 
 public class LanguagesManager {
+    private static String mFirstLanguage;
+    private static String mSecondLanguage;
+    private static Map<String, String> mLanguageReductions;
     private Context mContext;
-    private String mFirstLanguage;
-    private String mSecondLanguage;
-    private Map<String, String> mLanguageReductions;
 
     public LanguagesManager(Context context) {
         mContext = context;
@@ -40,6 +40,42 @@ public class LanguagesManager {
         mLanguageReductions.put(mContext.getResources().getString(R.string.lithuanian), "lt");
     }
 
+    public static String getFirstLanguage() {
+        return mFirstLanguage;
+    }
+
+    public static void setFirstLanguage(String firstLanguage) {
+        if (getSecondLanguage().equals(firstLanguage)) mSecondLanguage = mFirstLanguage;
+        mFirstLanguage = firstLanguage;
+    }
+
+    public static String getLanguageFromLanguageReduction(String languageReduction) {
+        for (String s : mLanguageReductions.keySet()) {
+            if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
+        }
+        return "";
+    }
+
+    public static String getSecondLanguage() {
+        return mSecondLanguage;
+    }
+
+    public static void setSecondLanguage(String secondLanguage) {
+        if (getFirstLanguage().equals(secondLanguage)) mFirstLanguage = mSecondLanguage;
+        mSecondLanguage = secondLanguage;
+    }
+
+    public static Map<String, String> getLanguageReductions() {
+        return mLanguageReductions;
+    }
+
+    public static List<String> getLanguagesList() {
+        List<String> languages = new ArrayList<>();
+        languages.addAll(mLanguageReductions.keySet());
+        Collections.sort(languages);
+        return languages;
+    }
+
     public String getRightLanguageReduction(String text) {
         return new NetworkManager(mContext, text).getFirstLanguageReduction();
     }
@@ -54,41 +90,5 @@ public class LanguagesManager {
 
     public void makeFirstLanguageRight(String text) {
         setFirstLanguage(getRightLanguage(text));
-    }
-
-    public String getFirstLanguage() {
-        return mFirstLanguage;
-    }
-
-    public void setFirstLanguage(String firstLanguage) {
-        if (getSecondLanguage().equals(firstLanguage)) mSecondLanguage = mFirstLanguage;
-        mFirstLanguage = firstLanguage;
-    }
-
-    public String getLanguageFromLanguageReduction(String languageReduction) {
-        for (String s : mLanguageReductions.keySet()) {
-            if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
-        }
-        return "";
-    }
-
-    public String getSecondLanguage() {
-        return mSecondLanguage;
-    }
-
-    public void setSecondLanguage(String secondLanguage) {
-        if (getFirstLanguage().equals(secondLanguage)) mFirstLanguage = mSecondLanguage;
-        mSecondLanguage = secondLanguage;
-    }
-
-    public Map<String, String> getLanguageReductions() {
-        return mLanguageReductions;
-    }
-
-    public List<String> getLanguagesList() {
-        List<String> languages = new ArrayList<>();
-        languages.addAll(mLanguageReductions.keySet());
-        Collections.sort(languages);
-        return languages;
     }
 }

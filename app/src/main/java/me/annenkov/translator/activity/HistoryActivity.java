@@ -60,7 +60,6 @@ public class HistoryActivity extends AppCompatActivity {
     private void initToolbar() {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
         mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.keyboard_backspace));
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
