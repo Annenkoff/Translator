@@ -8,11 +8,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -23,6 +25,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mancj.slideup.SlideUp;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
@@ -43,8 +46,11 @@ import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.model.HistoryElement;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerListener, Drawer.OnDrawerItemClickListener {
+    private View mDim;
+
     private Toolbar mToolbar;
     private Drawer mDrawer;
+    private SlideUp mSlide;
 
     private Timer mTimer;
     private HistoryManager mHistoryManager;
@@ -55,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText mInputText;
     private TextView mTranslatedText;
 
+    private FloatingActionButton mRecommendationFloatButton;
+    private Button mRightLanguageButton;
     private Button mFirstLanguageButton;
     private Button mSecondLanguageButton;
     private ImageButton mSwapLanguageButton;
@@ -68,22 +76,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SugarContext.init(this);
-
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        mToolbar = (Toolbar) this.findViewById(R.id.toolbar_main);
         initToolbar();
+
+        mDim = findViewById(R.id.dim);
+
         mDrawer = new DrawerBuilder()
                 .withActivity(this)
                 .withHeader(R.layout.drawer_header)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.main_page).withIcon(R.drawable.home).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.main_page).withIcon(R.drawable.home).withSelectable(true)
+                                .withSelectedTextColor(ContextCompat.getColor(this, R.color.greyDark)),
                         new PrimaryDrawerItem().withName(R.string.favorites).withIcon(R.drawable.bookmark_black).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.history).withIcon(R.drawable.history).withSelectable(false),
                         new PrimaryDrawerItem().withName(R.string.about).withIcon(R.drawable.information).withSelectable(false),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("GitHub").withIcon(R.drawable.github_circle).withSelectable(false)
+                        new SecondaryDrawerItem().withName(R.string.github).withIcon(R.drawable.github_circle).withSelectable(false)
                 )
                 .withOnDrawerListener(this)
                 .withOnDrawerItemClickListener(this)
+                .build();
+        View view = findViewById(R.id.slide_recommendation);
+        mSlide = new SlideUp.Builder(view)
+                .withListeners(new SlideUp.Listener() {
+                    @Override
+                    public void onSlide(float percent) {
+                        mDim.setAlpha(1 - (percent / 100));
+                    }
+
+                    @Override
+                    public void onVisibilityChanged(int visibility) {
+                        if (visibility == View.GONE
+                                && !mLanguagesManager.isFirstLanguageIsRight(mInputText.getText().toString())) {
+                            mRecommendationFloatButton.show();
+                        }
+                    }
+                })
+                .withStartState(SlideUp.State.HIDDEN)
+                .withStartGravity(Gravity.TOP)
                 .build();
 
         mHistoryManager = new HistoryManager();
@@ -94,6 +124,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mInputText = (EditText) findViewById(R.id.inputText);
         mTranslatedText = (TextView) findViewById(R.id.translatedText);
 
+        mRecommendationFloatButton = (FloatingActionButton) findViewById(R.id.recommendation_float_button_main);
+        mRecommendationFloatButton.hide();
+        mRecommendationFloatButton.setOnClickListener(this);
+        mRightLanguageButton = (Button) findViewById(R.id.right_language_button);
+        mRightLanguageButton.setOnClickListener(this);
         mFirstLanguageButton = (Button) findViewById(R.id.firstLanguage);
         mFirstLanguageButton.setOnClickListener(this);
         mSecondLanguageButton = (Button) findViewById(R.id.secondLanguage);
@@ -109,7 +144,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mShareButton = (ImageButton) findViewById(R.id.shareButtonMenu);
         mShareButton.setOnClickListener(this);
 
-        updateUI();
+        mFirstLanguageButton.setText(mLanguagesManager.getFirstLanguage());
+        mSecondLanguageButton.setText(mLanguagesManager.getSecondLanguage());
 
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -118,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mRecommendationFloatButton.hide();
                 if (mTimer != null) mTimer.cancel();
                 if (mHistoryManager.getTimer() != null) mHistoryManager.getTimer().cancel();
                 if (s.length() == 0) {
@@ -156,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void onTextChangedAction(String s) {
+    private void onTextChangedAction(final String s) {
         if (mHistoryManager.getTimer() != null) mHistoryManager.cancelTimer();
         offAddToFavoritesButton();
         textStatusAction(s, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
@@ -172,6 +209,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mHistoryManager.setCurrentHistoryElement(historyElement);
         if (((!request.equals("") || !request.isEmpty())) && !mHistoryManager.getFirstHistoryElement().equals(historyElement)) {
             mHistoryManager.addHistoryElementWithTimer(mHistoryManager.getCurrentHistoryElement(), 1650);
+        }
+        if (!mLanguagesManager.isFirstLanguageIsRight(s)) {
+            final String rightLanguage = mLanguagesManager.getRightLanguage(s);
+            mRightLanguageButton.setText(getString(R.string.set) + " " + rightLanguage);
+            mRecommendationFloatButton.show();
+            mRightLanguageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mLanguagesManager.makeFirstLanguageRight(s);
+                    updateUI();
+                    mSlide.hide();
+                    mRecommendationFloatButton.hide();
+                }
+            });
         }
     }
 
@@ -241,14 +292,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             switch (requestCode) {
                 case 1:
-                    if (mLanguagesManager.getSecondLanguage().equals(data.getStringExtra("LANGUAGE")))
-                        mLanguagesManager.setSecondLanguage(mLanguagesManager.getFirstLanguage());
                     mLanguagesManager.setFirstLanguage(data.getStringExtra("LANGUAGE"));
                     updateUI();
                     break;
                 case 2:
-                    if (mLanguagesManager.getFirstLanguage().equals(data.getStringExtra("LANGUAGE")))
-                        mLanguagesManager.setFirstLanguage(mLanguagesManager.getSecondLanguage());
                     mLanguagesManager.setSecondLanguage(data.getStringExtra("LANGUAGE"));
                     updateUI();
                     break;
@@ -277,6 +324,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.recommendation_float_button_main:
+                hideKeyboard();
+                mSlide.show();
+                mRecommendationFloatButton.hide();
+                break;
             case R.id.swapLanguage:
                 swapLanguages();
                 break;
@@ -321,10 +373,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onDrawerOpened(View drawerView) {
+    private void hideKeyboard() {
         InputMethodManager inputMethodManager = (InputMethodManager) MainActivity.this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(MainActivity.this.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        hideKeyboard();
+        if (mSlide.isVisible()) mSlide.hide();
     }
 
     @Override

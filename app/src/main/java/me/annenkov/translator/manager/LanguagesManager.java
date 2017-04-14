@@ -40,11 +40,28 @@ public class LanguagesManager {
         mLanguageReductions.put(mContext.getResources().getString(R.string.lithuanian), "lt");
     }
 
+    public String getRightLanguageReduction(String text) {
+        return new NetworkManager(mContext, text).getFirstLanguageReduction();
+    }
+
+    public String getRightLanguage(String text) {
+        return getLanguageFromLanguageReduction(getRightLanguageReduction(text));
+    }
+
+    public boolean isFirstLanguageIsRight(String text) {
+        return text.isEmpty() || getRightLanguage(text).equals(getFirstLanguage());
+    }
+
+    public void makeFirstLanguageRight(String text) {
+        setFirstLanguage(getRightLanguage(text));
+    }
+
     public String getFirstLanguage() {
         return mFirstLanguage;
     }
 
     public void setFirstLanguage(String firstLanguage) {
+        if (getSecondLanguage().equals(firstLanguage)) mSecondLanguage = mFirstLanguage;
         mFirstLanguage = firstLanguage;
     }
 
@@ -52,7 +69,7 @@ public class LanguagesManager {
         for (String s : mLanguageReductions.keySet()) {
             if (mLanguageReductions.get(s).equalsIgnoreCase(languageReduction)) return s;
         }
-        return null;
+        return "";
     }
 
     public String getSecondLanguage() {
@@ -60,6 +77,7 @@ public class LanguagesManager {
     }
 
     public void setSecondLanguage(String secondLanguage) {
+        if (getFirstLanguage().equals(secondLanguage)) mFirstLanguage = mSecondLanguage;
         mSecondLanguage = secondLanguage;
     }
 

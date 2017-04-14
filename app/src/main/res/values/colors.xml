@@ -2,8 +2,12 @@
 <resources>
     <color name="black">#212121</color>
     <color name="white">#ffffff</color>
-    <color name="grey">#607D8B</color>
-    <color name="lightRed">#FFCDD2</color>
-    <color name="red">#F44336</color>
-    <color name="darkRed">#D32F2F</color>
+    <color name="greyLight">#8eacbb</color>
+    <color name="grey">#607d8b</color>
+    <color name="greyDark">#34515e</color>
+    <color name="lightRed">#ff6659</color>
+    <color name="red">#d32f2f</color>
+    <color name="darkRed">#9a0007</color>
+    <color name="blue">#2196f3</color>
+    <color name="dimBackground">#bf000000</color>
 </resources>

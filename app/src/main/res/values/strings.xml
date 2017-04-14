@@ -31,4 +31,7 @@
     <string name="main_page">Main page</string>
     <string name="history_cleared_toast">History was cleared</string>
     <string name="favorites_cleared_toast">Favorites was cleared</string>
+    <string name="github" translatable="false">GitHub</string>
+    <string name="slide_to_close">Slide to close</string>
+    <string name="set">Set</string>
 </resources>

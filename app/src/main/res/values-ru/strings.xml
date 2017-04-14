@@ -30,4 +30,6 @@
     <string name="main_page">Главная страница</string>
     <string name="history_cleared_toast">История очищена</string>
     <string name="favorites_cleared_toast">Избранные переводы удалены</string>
+    <string name="slide_to_close">Потяни, чтобы закрыть</string>
+    <string name="set">Установить</string>
 </resources>

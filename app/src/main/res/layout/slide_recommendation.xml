@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/slide_recommendation"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <RelativeLayout
+        android:id="@+id/slideView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="26dp"
+        android:background="@drawable/rounded_down_corners_bg">
+
+        <ImageView
+            android:id="@+id/creation_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/creation"/>
+
+        <TextView
+            android:id="@+id/wrong_language_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/creation_imageview"
+            android:gravity="center_horizontal"
+            android:text="Кажется, выбран неправильный язык для перевода."
+            android:textColor="@color/black"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/right_language_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/wrong_language_textview"
+            android:textColor="@color/darkRed"
+            android:textSize="18sp"/>
+
+        <ImageView
+            android:id="@+id/arrow_up_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/slide_to_close_text"
+            android:layout_marginBottom="4dp"
+            android:src="@drawable/ic_keyboard_arrow_up_black_24dp"/>
+
+        <TextView
+            android:id="@+id/slide_to_close_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp"
+            android:gravity="center_horizontal"
+            android:text="@string/slide_to_close"
+            android:textColor="@color/greyLight"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
