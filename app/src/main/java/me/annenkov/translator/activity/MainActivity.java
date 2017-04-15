@@ -47,7 +47,7 @@ import me.annenkov.translator.model.HistoryElement;
  * Главный Activity. Точка входа в приложение.
  * Представляет экран для перевода.
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerListener, Drawer.OnDrawerItemClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerItemClickListener {
     private View mDim;
 
     private Toolbar mToolbar;
@@ -94,7 +94,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new DividerDrawerItem(),
                         new SecondaryDrawerItem().withName(R.string.github).withIcon(R.drawable.github_circle).withSelectable(false)
                 )
-                .withOnDrawerListener(this)
+                .withOnDrawerListener(new Drawer.OnDrawerListener() {
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        mUtils.hideKeyboard();
+                        if (mSlide.isVisible()) mSlide.hide();
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+
+                    }
+
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                    }
+                })
                 .withOnDrawerItemClickListener(this)
                 .build();
         mSlide = new SlideUp.Builder(findViewById(R.id.slide_recommendation))
@@ -381,22 +397,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onDrawerOpened(View drawerView) {
-        mUtils.hideKeyboard();
-        if (mSlide.isVisible()) mSlide.hide();
-    }
-
-    @Override
-    public void onDrawerClosed(View drawerView) {
-
-    }
-
-    @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-
-    }
-
-    @Override
     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
         Intent intent;
         Bundle bundle = new Bundle();
@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 break;
             case 6:
-                mUtils.startBrowser("https://github.com/annenkoff/Translator");
+                mUtils.startBrowser("https://github.com/ZZooRM/Translator");
                 break;
         }
         return false;
