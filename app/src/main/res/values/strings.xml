@@ -20,7 +20,6 @@
     <string name="lithuanian">Lithuanian</string>
     <string name="history">History</string>
     <string name="favorites">Favorites</string>
-    <string name="yandex_api_key" translatable="false">trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29</string>
     <string name="empty_history_message">Oops... Your history is empty!</string>
     <string name="empty_favorites_message">Oops... You don\'t have favorite translations.</string>
     <string name="about">About</string>

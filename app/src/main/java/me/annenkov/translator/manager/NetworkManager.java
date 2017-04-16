@@ -14,27 +14,23 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-import me.annenkov.translator.R;
-
 /**
  * Класс для работы с сетью и API.
  */
 public class NetworkManager {
+    private static final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
     private Context mContext;
-    private String mYandexApiKey;
     private String mText;
     private String mFirstLanguage;
     private String mSecondLanguage;
 
     public NetworkManager(Context context, String text) {
         mContext = context;
-        mYandexApiKey = mContext.getString(R.string.yandex_api_key);
         mText = text;
     }
 
     public NetworkManager(Context context, String text, String firstLanguage, String secondLanguage) {
         mContext = context;
-        mYandexApiKey = mContext.getString(R.string.yandex_api_key);
         mText = text;
         mFirstLanguage = firstLanguage;
         mSecondLanguage = secondLanguage;
@@ -42,7 +38,7 @@ public class NetworkManager {
 
     public String getTranslatedText() {
         try {
-            return new AsyncRequestToGetTranslatedText().execute(mYandexApiKey,
+            return new AsyncRequestToGetTranslatedText().execute(YANDEX_API_KEY,
                     mText,
                     mFirstLanguage,
                     mSecondLanguage).get();
@@ -58,7 +54,7 @@ public class NetworkManager {
      */
     public String getRightLanguageReduction() {
         try {
-            return new AsyncRequestToGetRightLanguageReduction().execute(mYandexApiKey, mText).get();
+            return new AsyncRequestToGetRightLanguageReduction().execute(YANDEX_API_KEY, mText).get();
         } catch (InterruptedException | ExecutionException e) {
             return "";
         }
