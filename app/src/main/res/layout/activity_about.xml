@@ -34,10 +34,10 @@
             android:textSize="38sp"/>
 
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_above="@id/app_name_about"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/book_open_page_variant"/>
+            android:src="@drawable/hand_pointing_right"/>
     </RelativeLayout>
 </RelativeLayout>

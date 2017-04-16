@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.annenkov.translator.R;
+import me.annenkov.translator.activity.MainActivity;
 
 /**
  * Класс для работы с языками.
@@ -18,57 +19,60 @@ import me.annenkov.translator.R;
  * "второй" - язык, на который требуется перевести.
  */
 public class LanguagesManager {
-    private static String mFirstLanguage;
-    private static String mSecondLanguage;
+    private static MainActivity sMainActivity;
     private static Map<String, String> mLanguageReductions;
 
-    public static void init(Context context) {
-        mFirstLanguage = context.getResources().getString(R.string.russian);
-        mSecondLanguage = context.getResources().getString(R.string.english);
+    public static void init(MainActivity activity) {
+        sMainActivity = activity;
+
+        activity.getFirstLanguageButton().setText(activity.getResources().getString(R.string.russian));
+        activity.getSecondLanguageButton().setText(activity.getResources().getString(R.string.english));
 
         mLanguageReductions = new ArrayMap<>();
-        mLanguageReductions.put(context.getResources().getString(R.string.russian), "ru");
-        mLanguageReductions.put(context.getResources().getString(R.string.english), "en");
-        mLanguageReductions.put(context.getResources().getString(R.string.polish), "pl");
-        mLanguageReductions.put(context.getResources().getString(R.string.italian), "it");
-        mLanguageReductions.put(context.getResources().getString(R.string.german), "de");
-        mLanguageReductions.put(context.getResources().getString(R.string.portuguese), "pt");
-        mLanguageReductions.put(context.getResources().getString(R.string.norwegian), "no");
-        mLanguageReductions.put(context.getResources().getString(R.string.ukrainian), "uk");
-        mLanguageReductions.put(context.getResources().getString(R.string.greek), "el");
-        mLanguageReductions.put(context.getResources().getString(R.string.chinese), "zh");
-        mLanguageReductions.put(context.getResources().getString(R.string.japanese), "ja");
-        mLanguageReductions.put(context.getResources().getString(R.string.turkish), "tr");
-        mLanguageReductions.put(context.getResources().getString(R.string.indonesian), "id");
-        mLanguageReductions.put(context.getResources().getString(R.string.hebrew), "he");
-        mLanguageReductions.put(context.getResources().getString(R.string.latin), "la");
-        mLanguageReductions.put(context.getResources().getString(R.string.lithuanian), "lt");
+        mLanguageReductions.put(activity.getResources().getString(R.string.russian), "ru");
+        mLanguageReductions.put(activity.getResources().getString(R.string.english), "en");
+        mLanguageReductions.put(activity.getResources().getString(R.string.polish), "pl");
+        mLanguageReductions.put(activity.getResources().getString(R.string.italian), "it");
+        mLanguageReductions.put(activity.getResources().getString(R.string.german), "de");
+        mLanguageReductions.put(activity.getResources().getString(R.string.portuguese), "pt");
+        mLanguageReductions.put(activity.getResources().getString(R.string.norwegian), "no");
+        mLanguageReductions.put(activity.getResources().getString(R.string.ukrainian), "uk");
+        mLanguageReductions.put(activity.getResources().getString(R.string.greek), "el");
+        mLanguageReductions.put(activity.getResources().getString(R.string.chinese), "zh");
+        mLanguageReductions.put(activity.getResources().getString(R.string.japanese), "ja");
+        mLanguageReductions.put(activity.getResources().getString(R.string.turkish), "tr");
+        mLanguageReductions.put(activity.getResources().getString(R.string.indonesian), "id");
+        mLanguageReductions.put(activity.getResources().getString(R.string.hebrew), "he");
+        mLanguageReductions.put(activity.getResources().getString(R.string.latin), "la");
+        mLanguageReductions.put(activity.getResources().getString(R.string.lithuanian), "lt");
     }
 
     public static String getFirstLanguage() {
-        return mFirstLanguage;
+        return sMainActivity.getFirstLanguageButton().getText().toString();
     }
 
     public static void setFirstLanguage(String firstLanguage) {
-        if (getSecondLanguage().equals(firstLanguage)) mSecondLanguage = mFirstLanguage;
-        mFirstLanguage = firstLanguage;
+        if (getSecondLanguage().equals(firstLanguage))
+            sMainActivity.getSecondLanguageButton().setText(getFirstLanguage());
+        sMainActivity.getFirstLanguageButton().setText(firstLanguage);
     }
 
     public static String getFirstLanguageReduction() {
-        return getLanguageReduction(mFirstLanguage);
+        return getLanguageReduction(getFirstLanguage());
     }
 
     public static String getSecondLanguage() {
-        return mSecondLanguage;
+        return sMainActivity.getSecondLanguageButton().getText().toString();
     }
 
     public static void setSecondLanguage(String secondLanguage) {
-        if (getFirstLanguage().equals(secondLanguage)) mFirstLanguage = mSecondLanguage;
-        mSecondLanguage = secondLanguage;
+        if (getFirstLanguage().equals(secondLanguage))
+            sMainActivity.getFirstLanguageButton().setText(getSecondLanguage());
+        sMainActivity.getSecondLanguageButton().setText(secondLanguage);
     }
 
     public static String getSecondLanguageReduction() {
-        return getLanguageReduction(mSecondLanguage);
+        return getLanguageReduction(getSecondLanguage());
     }
 
     /**
@@ -86,6 +90,12 @@ public class LanguagesManager {
 
     public static String getLanguageReduction(String language) {
         return mLanguageReductions.get(language);
+    }
+
+    public static void swapLanguages() {
+        String buffer = getFirstLanguage();
+        sMainActivity.getFirstLanguageButton().setText(getSecondLanguage());
+        sMainActivity.getSecondLanguageButton().setText(buffer);
     }
 
     public static Map<String, String> getLanguageReductions() {

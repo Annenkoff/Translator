@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SugarContext.init(this);
         mToolbar = (Toolbar) this.findViewById(R.id.toolbar_main);
         initToolbar();
-        LanguagesManager.init(this);
 
         mDim = findViewById(R.id.dim);
 
@@ -157,9 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCopyTextButton.setOnClickListener(this);
         mShareButton = (ImageButton) findViewById(R.id.shareButtonMenu);
         mShareButton.setOnClickListener(this);
-
-        mFirstLanguageButton.setText(LanguagesManager.getFirstLanguage());
-        mSecondLanguageButton.setText(LanguagesManager.getSecondLanguage());
+        LanguagesManager.init(this);
 
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -224,6 +221,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Action.firstLanguageIsRightAction(this, firstText);
     }
 
+    public Button getFirstLanguageButton() {
+        return mFirstLanguageButton;
+    }
+
+    public Button getSecondLanguageButton() {
+        return mSecondLanguageButton;
+    }
+
     public SlideUp getSlide() {
         return mSlide;
     }
@@ -258,13 +263,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mClearTextButton;
     }
 
-    public void swapLanguages() {
-        String buffer = LanguagesManager.getFirstLanguage();
-        LanguagesManager.setFirstLanguage(LanguagesManager.getSecondLanguage());
-        LanguagesManager.setSecondLanguage(buffer);
-        updateUI();
-    }
-
     private void offAddToFavoritesButton() {
         mAddToFavoritesButton.setImageResource(R.drawable.bookmark_outline_white);
     }
@@ -278,8 +276,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateUI() {
-        mFirstLanguageButton.setText(LanguagesManager.getFirstLanguage());
-        mSecondLanguageButton.setText(LanguagesManager.getSecondLanguage());
         onTextChangedAction(mInputText.getText().toString());
         updateAddToFavoritesButton();
     }
@@ -311,16 +307,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case 3:
                     HistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
                     if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
-                        mFirstLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
-                        mSecondLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
+                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
+                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
                         mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
                     }
                     break;
                 case 4:
                     HistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
                     if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
-                        mFirstLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
-                        mSecondLanguageButton.setText(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
+                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
+                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
                         mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
                     }
                     break;
@@ -339,7 +335,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mRecommendationFloatButton.hide();
                 break;
             case R.id.swapLanguage:
-                swapLanguages();
+                LanguagesManager.swapLanguages();
+                updateUI();
                 break;
             case R.id.firstLanguage:
                 Intent intent1 = new Intent(MainActivity.this, SelectLanguageActivity.class);
