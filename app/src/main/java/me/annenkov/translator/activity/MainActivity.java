@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onTextChangedAction(final String firstText) {
+        mRecommendationFloatButton.hide();
         String secondText = Utils.getTranslation(this, firstText);
         mTranslatedText.setText(secondText);
         Action.textStatusAction(this, firstText, secondText, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
