@@ -98,8 +98,8 @@ public class HistoryElement extends SugarRecord implements Parcelable {
 
         HistoryElement that = (HistoryElement) o;
 
-        if (!firstLanguageReduction.equals(that.firstLanguageReduction)) return false;
-        if (!secondLanguageReduction.equals(that.secondLanguageReduction)) return false;
+        if (!firstLanguageReduction.equalsIgnoreCase(that.firstLanguageReduction)) return false;
+        if (!secondLanguageReduction.equalsIgnoreCase(that.secondLanguageReduction)) return false;
         if (!firstText.equals(that.firstText)) return false;
         return secondText.equals(that.secondText);
 

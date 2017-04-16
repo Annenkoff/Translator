@@ -14,7 +14,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -35,11 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.annenkov.translator.R;
-import me.annenkov.translator.Utils;
-import me.annenkov.translator.manager.CacheManager;
+import me.annenkov.translator.helper.Action;
+import me.annenkov.translator.helper.Utils;
 import me.annenkov.translator.manager.HistoryManager;
 import me.annenkov.translator.manager.LanguagesManager;
-import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.manager.TimerManager;
 import me.annenkov.translator.model.HistoryElement;
 
@@ -53,9 +51,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private SlideUp mSlide;
-
-    private Utils mUtils;
-    private LanguagesManager mLanguagesManager;
 
     private ScrollView mTranslatedTextScrollView;
 
@@ -72,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mCopyTextButton;
     private ImageButton mShareButton;
 
+    /**
+     * Инициализируем методы, которые нам потребуются для работы:
+     * Тулбар, шторка, слайдер, кнопки, поля и т.д.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SugarContext.init(this);
         mToolbar = (Toolbar) this.findViewById(R.id.toolbar_main);
         initToolbar();
+        LanguagesManager.init(this);
 
         mDim = findViewById(R.id.dim);
 
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .withOnDrawerListener(new Drawer.OnDrawerListener() {
                     @Override
                     public void onDrawerOpened(View drawerView) {
-                        mUtils.hideKeyboard();
+                        Utils.hideKeyboard(MainActivity.this);
                         if (mSlide.isVisible()) mSlide.hide();
                     }
 
@@ -123,7 +123,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onVisibilityChanged(int visibility) {
                         if (visibility == View.GONE
-                                && !mLanguagesManager.isFirstLanguageIsRight(mInputText.getText().toString())) {
+                                && !LanguagesManager.isFirstLanguageRight(MainActivity.this, mInputText.getText()
+                                .toString())) {
                             mRecommendationFloatButton.show();
                         }
                     }
@@ -131,9 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .withStartState(SlideUp.State.HIDDEN)
                 .withStartGravity(Gravity.TOP)
                 .build();
-
-        mUtils = new Utils(this);
-        mLanguagesManager = new LanguagesManager(this);
 
         mTranslatedTextScrollView = (ScrollView) findViewById(R.id.translatedTextScrollView);
 
@@ -169,13 +167,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onTextChanged(final CharSequence s, int start, int before, int count) {
                 mRecommendationFloatButton.hide();
-                if (TimerManager.getTranslateTimer() != null) TimerManager.cancelTranslateTimer();
+                if (TimerManager.getTranslateTimer() != null)
+                    TimerManager.cancelTranslateTimer();
                 if (TimerManager.getAddHistoryElementTimer() != null)
                     TimerManager.cancelAddHistoryElementTimer();
+                offAddToFavoritesButton();
                 if (s.length() == 0) {
-                    onTextChangedAction(s.toString());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onTextChangedAction(s.toString());
+                        }
+                    });
                     return;
                 }
                 TimerManager.startTranslateTimer(MainActivity.this, s.toString());
@@ -208,43 +213,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onTextChangedAction(final String firstText) {
-        if (TimerManager.getAddHistoryElementTimer() != null)
-            TimerManager.cancelAddHistoryElementTimer();
-        offAddToFavoritesButton();
-        String secondText = CacheManager
-                .getTranslationFromText(LanguagesManager.getFirstLanguageReduction(), firstText);
-        if (secondText == null) {
-            secondText = new NetworkManager(MainActivity.this,
-                    firstText,
-                    LanguagesManager.getLanguageReductions().get(LanguagesManager.getFirstLanguage()),
-                    LanguagesManager.getLanguageReductions().get(LanguagesManager.getSecondLanguage())).getTranslatedText();
-            CacheManager.addToCache(LanguagesManager.getFirstLanguageReduction(),
-                    firstText, secondText);
-        }
+        String secondText = Utils.getTranslation(this, firstText);
         mTranslatedText.setText(secondText);
-        textStatusAction(firstText, secondText, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
-        HistoryElement historyElement = new HistoryElement(LanguagesManager.getLanguageReductions().get(LanguagesManager.getFirstLanguage()).toUpperCase(),
-                LanguagesManager.getLanguageReductions().get(LanguagesManager.getSecondLanguage()).toUpperCase(),
-                firstText,
-                secondText);
-        HistoryManager.setCurrentHistoryElement(historyElement);
-        if (((!secondText.equals("") || !secondText.isEmpty())) && !HistoryManager.getFirstHistoryElement().equals(historyElement)) {
-            HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement());
-        }
-        if (!mLanguagesManager.isFirstLanguageIsRight(firstText)) {
-            final String rightLanguage = mLanguagesManager.getRightLanguage(firstText);
-            mRightLanguageButton.setText(getString(R.string.set) + " " + rightLanguage);
-            mRecommendationFloatButton.show();
-            mRightLanguageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mLanguagesManager.makeFirstLanguageRight(firstText);
-                    updateUI();
-                    mSlide.hide();
-                    mRecommendationFloatButton.hide();
-                }
-            });
-        }
+        Action.textStatusAction(this, firstText, secondText, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
+        HistoryElement historyElement = HistoryManager.getCurrentHistoryElement(this);
+        if (((!secondText.equals("") || !secondText.isEmpty()))
+                && !HistoryManager.getFirstHistoryElement().equals(historyElement))
+            HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement(this));
+        if (!LanguagesManager.isFirstLanguageRight(this, firstText))
+            Action.firstLanguageIsRightAction(this, firstText);
+    }
+
+    public SlideUp getSlide() {
+        return mSlide;
+    }
+
+    public FloatingActionButton getRecommendationFloatButton() {
+        return mRecommendationFloatButton;
+    }
+
+    public Button getRightLanguageButton() {
+        return mRightLanguageButton;
     }
 
     @Override
@@ -253,23 +242,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SugarContext.terminate();
     }
 
-    public void textStatusAction(String firstText, String secondText, boolean isShowed) {
-        if (!firstText.isEmpty() && !secondText.isEmpty() && !isShowed) textNotEmptyAction();
-        else if (firstText.isEmpty() && secondText.isEmpty() && isShowed) textEmptyAction();
-        else if (!firstText.isEmpty()) mClearTextButton.setVisibility(View.VISIBLE);
-        else if (firstText.isEmpty()) mClearTextButton.setVisibility(View.INVISIBLE);
+    public EditText getInputText() {
+        return mInputText;
     }
 
-    public void textNotEmptyAction() {
-        mTranslatedTextScrollView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.show_element));
-        mTranslatedTextScrollView.setVisibility(View.VISIBLE);
-        mClearTextButton.setVisibility(View.VISIBLE);
+    public TextView getTranslatedText() {
+        return mTranslatedText;
     }
 
-    public void textEmptyAction() {
-        mTranslatedTextScrollView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.hide_element));
-        mTranslatedTextScrollView.setVisibility(View.INVISIBLE);
-        mClearTextButton.setVisibility(View.INVISIBLE);
+    public ScrollView getTranslatedTextScrollView() {
+        return mTranslatedTextScrollView;
+    }
+
+    public ImageButton getClearTextButton() {
+        return mClearTextButton;
     }
 
     public void swapLanguages() {
@@ -348,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.recommendation_float_button_main:
-                mUtils.hideKeyboard();
+                Utils.hideKeyboard(this);
                 mSlide.show();
                 mRecommendationFloatButton.hide();
                 break;
@@ -369,11 +355,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 clearText();
                 break;
             case R.id.addToFavoritesButtonMain:
-                if (HistoryManager.getCurrentHistoryElement().getFirstText().isEmpty()) return;
+                if (HistoryManager.getCurrentHistoryElement(MainActivity.this).getFirstText().isEmpty())
+                    return;
                 TimerManager.cancelAddHistoryElementTimer();
-                if (HistoryManager.getElementInHistoryIndex(HistoryManager.getCurrentHistoryElement()) != 0) {
-                    HistoryManager.getCurrentHistoryElement().setFavorite(!HistoryManager.getCurrentHistoryElement().isFavorite());
-                    HistoryManager.addHistoryElement(HistoryManager.getCurrentHistoryElement());
+                if (HistoryManager.getElementInHistoryIndex(HistoryManager.getCurrentHistoryElement(MainActivity.this)) != 0) {
+                    HistoryManager.getCurrentHistoryElement(MainActivity.this).setFavorite(!HistoryManager.getCurrentHistoryElement(MainActivity.this).isFavorite());
+                    HistoryManager.addHistoryElement(HistoryManager.getCurrentHistoryElement(MainActivity.this));
                 } else {
                     HistoryElement historyElement = HistoryManager.getFirstHistoryElement();
                     historyElement.setFavorite(!HistoryManager.getFirstHistoryElement().isFavorite());
@@ -419,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 break;
             case 6:
-                mUtils.startBrowser("https://github.com/ZZooRM/Translator");
+                Utils.startBrowser(this, "https://github.com/ZZooRM/Translator");
                 break;
         }
         return false;

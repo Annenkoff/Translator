@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.model.HistoryElement;
 
 /**
@@ -12,23 +13,6 @@ import me.annenkov.translator.model.HistoryElement;
  * DAO класса HistoryElement и библиотеки Sugar ORM.
  */
 public class HistoryManager {
-    /**
-     * Текущий элемент в истории - элемент, на котором в данный
-     * момент сфокусировано внимание. Эдакий "курсор". Причём,
-     * он не обязательно должен находится в истории.
-     * <p>
-     * Используется, когда элемент уже добавлен в историю, но
-     * затем добавляется в избранное из главного экрана.
-     * Если последний элемент в истории и текущий элемент
-     * совпадают - последний элемент заменяется текущим.
-     * Дублирования не происходит.
-     */
-    private static HistoryElement mCurrentHistoryElement;
-
-    public HistoryManager() {
-        mCurrentHistoryElement = new HistoryElement("", "", "", "");
-    }
-
     public static void addHistoryElement(HistoryElement historyElement) {
         historyElement.save();
     }
@@ -37,7 +21,7 @@ public class HistoryManager {
      * Добавление в историю по таймеру.
      * Переводчик не имеет кнопки для перевода, поэтому
      * перевод осуществляется через определённое время после
-     * набора текста.
+     * набора текста. Сделано для оптимизации трафика.
      *
      * @param historyElement Элемент, который добавляется в историю.
      */
@@ -69,12 +53,19 @@ public class HistoryManager {
         }
     }
 
-    public static HistoryElement getCurrentHistoryElement() {
-        return mCurrentHistoryElement;
-    }
-
-    public static void setCurrentHistoryElement(HistoryElement currentHistoryElement) {
-        mCurrentHistoryElement = currentHistoryElement;
+    /**
+     * Генерация "текущего элемента истории".
+     * Текущий элемент истории - элемент, который содержит информацию из MainActivity
+     * и не обязательно хранится в истории в данный момент. Сделано для того, чтобы
+     * не происходило дублирования при добавлении в избранное на главном экране.
+     *
+     * @param activity Активити, из которого берётся информация о текстах.
+     */
+    public static HistoryElement getCurrentHistoryElement(MainActivity activity) {
+        return new HistoryElement(LanguagesManager.getFirstLanguageReduction().toUpperCase(),
+                LanguagesManager.getSecondLanguageReduction().toUpperCase(),
+                activity.getInputText().getText().toString(),
+                activity.getTranslatedText().getText().toString());
     }
 
     /**
