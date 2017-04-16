@@ -10,6 +10,7 @@ import java.util.Map;
 
 import me.annenkov.translator.R;
 import me.annenkov.translator.activity.MainActivity;
+import ru.yandex.speechkit.Vocalizer;
 
 /**
  * Класс для работы с языками.
@@ -96,6 +97,15 @@ public class LanguagesManager {
         String buffer = getFirstLanguage();
         sMainActivity.getFirstLanguageButton().setText(getSecondLanguage());
         sMainActivity.getSecondLanguageButton().setText(buffer);
+    }
+
+    public static String getVocalizerLanguage(String language) {
+        String languageReduction = getLanguageReduction(language);
+        if (languageReduction.equals("en")) return Vocalizer.Language.ENGLISH;
+        if (languageReduction.equals("ru")) return Vocalizer.Language.RUSSIAN;
+        if (languageReduction.equals("uk")) return Vocalizer.Language.UKRAINIAN;
+        if (languageReduction.equals("tr")) return Vocalizer.Language.TURKISH;
+        else return "";
     }
 
     public static Map<String, String> getLanguageReductions() {

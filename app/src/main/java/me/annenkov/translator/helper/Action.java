@@ -23,12 +23,14 @@ public class Action {
         activity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(activity, R.anim.show_element));
         activity.getTranslatedTextScrollView().setVisibility(View.VISIBLE);
         activity.getClearTextButton().setVisibility(View.VISIBLE);
+        activity.getVocalizeFirstText().setVisibility(View.VISIBLE);
     }
 
     private static void textEmptyAction(MainActivity activity) {
         activity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(activity, R.anim.hide_element));
         activity.getTranslatedTextScrollView().setVisibility(View.INVISIBLE);
         activity.getClearTextButton().setVisibility(View.INVISIBLE);
+        activity.getVocalizeFirstText().setVisibility(View.INVISIBLE);
     }
 
     public static void firstLanguageIsRightAction(final MainActivity activity, final String firstText) {

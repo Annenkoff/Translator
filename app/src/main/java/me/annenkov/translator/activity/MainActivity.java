@@ -38,6 +38,7 @@ import me.annenkov.translator.helper.Action;
 import me.annenkov.translator.helper.Utils;
 import me.annenkov.translator.manager.HistoryManager;
 import me.annenkov.translator.manager.LanguagesManager;
+import me.annenkov.translator.manager.SpeechManager;
 import me.annenkov.translator.manager.TimerManager;
 import me.annenkov.translator.model.HistoryElement;
 
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mFirstLanguageButton;
     private Button mSecondLanguageButton;
     private ImageButton mSwapLanguageButton;
+    private ImageButton mVocalizeFirstText;
+    private ImageButton mVocalizeSecondText;
     private ImageButton mClearTextButton;
     private ImageButton mAddToFavoritesButton;
     private ImageButton mCopyTextButton;
@@ -148,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSecondLanguageButton.setOnClickListener(this);
         mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
         mSwapLanguageButton.setOnClickListener(this);
+        mVocalizeFirstText = (ImageButton) findViewById(R.id.vocalizeFirstText);
+        mVocalizeFirstText.setOnClickListener(this);
+        mVocalizeSecondText = (ImageButton) findViewById(R.id.vocalizeSecondText);
+        mVocalizeSecondText.setOnClickListener(this);
         mClearTextButton = (ImageButton) findViewById(R.id.clearTextMain);
         mClearTextButton.setOnClickListener(this);
         mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
@@ -156,7 +163,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCopyTextButton.setOnClickListener(this);
         mShareButton = (ImageButton) findViewById(R.id.shareButtonMenu);
         mShareButton.setOnClickListener(this);
+
         LanguagesManager.init(this);
+        SpeechManager.init(this);
 
         mInputText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -264,6 +273,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mClearTextButton;
     }
 
+    public ImageButton getVocalizeFirstText() {
+        return mVocalizeFirstText;
+    }
+
+    public ImageButton getVocalizeSecondText() {
+        return mVocalizeSecondText;
+    }
+
     private void offAddToFavoritesButton() {
         mAddToFavoritesButton.setImageResource(R.drawable.bookmark_outline_white);
     }
@@ -348,6 +365,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent2 = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent2.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) LanguagesManager.getLanguagesList());
                 startActivityForResult(intent2, 2);
+                break;
+            case R.id.vocalizeFirstText:
+                SpeechManager.vocalizeText(this,
+                        LanguagesManager.getVocalizerLanguage(mFirstLanguageButton.getText().toString()),
+                        mInputText.getText().toString());
+                break;
+            case R.id.vocalizeSecondText:
+                SpeechManager.vocalizeText(this,
+                        LanguagesManager.getVocalizerLanguage(mSecondLanguageButton.getText().toString()),
+                        mTranslatedText.getText().toString());
                 break;
             case R.id.clearTextMain:
                 clearText();
