@@ -66,11 +66,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/swapLanguage"
             android:layout_centerHorizontal="true"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
             android:hint="@string/type_text_for_translation"
             android:inputType="textMultiLine"
             android:maxHeight="150dp"
             android:minHeight="150dp"
-            android:padding="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="40dp"
             android:textSize="22sp"/>
 
         <ImageButton
@@ -116,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/inputText"
                     android:layout_centerHorizontal="true"
-                    android:layout_margin="30dp"
+                    android:layout_margin="35dp"
                     android:textColor="@color/white"
                     android:textSize="22sp"/>
 

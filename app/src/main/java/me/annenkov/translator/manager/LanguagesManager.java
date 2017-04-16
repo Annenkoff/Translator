@@ -99,8 +99,8 @@ public class LanguagesManager {
         sMainActivity.getSecondLanguageButton().setText(buffer);
     }
 
-    public static String getVocalizerLanguage(String language) {
-        String languageReduction = getLanguageReduction(language);
+    public static String getVocalizerLanguage(Context context, String text) {
+        String languageReduction = getRightLanguageReduction(context, text);
         if (languageReduction.equals("en")) return Vocalizer.Language.ENGLISH;
         if (languageReduction.equals("ru")) return Vocalizer.Language.RUSSIAN;
         if (languageReduction.equals("uk")) return Vocalizer.Language.UKRAINIAN;

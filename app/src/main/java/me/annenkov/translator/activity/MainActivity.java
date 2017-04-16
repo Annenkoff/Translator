@@ -181,12 +181,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     TimerManager.cancelAddHistoryElementTimer();
                 offAddToFavoritesButton();
                 if (s.length() == 0) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            onTextChangedAction(s.toString());
-                        }
-                    });
+                    onTextChangedAction(s.toString());
                     return;
                 }
                 TimerManager.startTranslateTimer(MainActivity.this, s.toString());
@@ -368,12 +363,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.vocalizeFirstText:
                 SpeechManager.vocalizeText(this,
-                        LanguagesManager.getVocalizerLanguage(mFirstLanguageButton.getText().toString()),
+                        LanguagesManager.getVocalizerLanguage(this, mInputText.getText().toString()),
                         mInputText.getText().toString());
                 break;
             case R.id.vocalizeSecondText:
                 SpeechManager.vocalizeText(this,
-                        LanguagesManager.getVocalizerLanguage(mSecondLanguageButton.getText().toString()),
+                        LanguagesManager.getVocalizerLanguage(this, mTranslatedText.getText().toString()),
                         mTranslatedText.getText().toString());
                 break;
             case R.id.clearTextMain:
