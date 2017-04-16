@@ -120,7 +120,9 @@ public class LanguagesManager {
     }
 
     public static String getRightLanguageReduction(Context context, String text) {
-        return new NetworkManager(context, text).getRightLanguageReduction();
+        String rightLanguageReduction = new NetworkManager(context, text).getRightLanguageReduction();
+        if (!mLanguageReductions.containsKey(rightLanguageReduction)) return "en";
+        return rightLanguageReduction;
     }
 
     public static String getRightLanguage(Context context, String text) {
