@@ -36,8 +36,10 @@ import java.util.List;
 import me.annenkov.translator.R;
 import me.annenkov.translator.helper.Action;
 import me.annenkov.translator.helper.Utils;
+import me.annenkov.translator.manager.CacheManager;
 import me.annenkov.translator.manager.HistoryManager;
 import me.annenkov.translator.manager.LanguagesManager;
+import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.manager.SpeechManager;
 import me.annenkov.translator.manager.TimerManager;
 import me.annenkov.translator.model.HistoryElement;
@@ -123,12 +125,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void onVisibilityChanged(int visibility) {
-                        if (visibility == View.GONE
-                                && !LanguagesManager.isFirstLanguageRight(MainActivity.this, mInputText.getText()
-                                .toString())) {
-                            mRecommendationFloatButton.show();
-                        }
+                    public void onVisibilityChanged(final int visibility) {
+                        new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
+                            @Override
+                            public void processFinish(String output) {
+                                if (visibility == View.GONE
+                                        && !output.equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())
+                                        && !mInputText.getText().toString().isEmpty()) {
+                                    mRecommendationFloatButton.show();
+                                }
+                            }
+                        }).execute(LanguagesManager.getFirstLanguageReduction());
                     }
                 })
                 .withStartState(SlideUp.State.HIDDEN)
@@ -214,16 +221,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onTextChangedAction(final String firstText) {
-        mRecommendationFloatButton.hide();
-        String secondText = Utils.getTranslation(this, firstText);
-        mTranslatedText.setText(secondText);
-        Action.textStatusAction(this, firstText, secondText, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
-        HistoryElement historyElement = HistoryManager.getCurrentHistoryElement(this);
-        if (((!secondText.equals("") || !secondText.isEmpty()))
-                && !HistoryManager.getFirstHistoryElement().equals(historyElement))
-            HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement(this));
-        if (!LanguagesManager.isFirstLanguageRight(this, firstText))
-            Action.firstLanguageIsRightAction(this, firstText);
+        String secondText = CacheManager
+                .getTranslationFromText(LanguagesManager.getFirstLanguageReduction(), firstText);
+        if (secondText == null) {
+            new NetworkManager.AsyncRequestToGetTranslatedText(new NetworkManager.AsyncRequestToGetTranslatedText.AsyncResponse() {
+                @Override
+                public void processFinish(String output) {
+                    mRecommendationFloatButton.hide();
+                    mTranslatedText.setText(output);
+                    Action.textStatusAction(MainActivity.this, firstText, output, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
+                    HistoryElement historyElement = HistoryManager.getCurrentHistoryElement(MainActivity.this);
+                    if (((!output.equals("") || !output.isEmpty()))
+                            && !HistoryManager.getFirstHistoryElement().equals(historyElement))
+                        HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement(MainActivity.this));
+                }
+            }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());
+        } else mTranslatedText.setText(secondText);
+        new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
+            @Override
+            public void processFinish(String output) {
+                String rightLanguageReduction = output;
+                if (!LanguagesManager.isLanguageExists(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
+                    rightLanguageReduction = "en";
+                if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
+                    Action.firstLanguageIsRightAction(MainActivity.this, firstText, LanguagesManager.getLanguage(rightLanguageReduction));
+            }
+        }).execute(firstText);
     }
 
     public Button getFirstLanguageButton() {
@@ -270,10 +293,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public ImageButton getVocalizeFirstText() {
         return mVocalizeFirstText;
-    }
-
-    public ImageButton getVocalizeSecondText() {
-        return mVocalizeSecondText;
     }
 
     private void offAddToFavoritesButton() {
@@ -363,12 +382,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.vocalizeFirstText:
                 SpeechManager.vocalizeText(this,
-                        LanguagesManager.getVocalizerLanguage(this, mInputText.getText().toString()),
+                        LanguagesManager.getVocalizerLanguage(this, mInputText.getText().toString(), LanguagesManager.getFirstLanguageReduction()),
                         mInputText.getText().toString());
                 break;
             case R.id.vocalizeSecondText:
                 SpeechManager.vocalizeText(this,
-                        LanguagesManager.getVocalizerLanguage(this, mTranslatedText.getText().toString()),
+                        LanguagesManager.getVocalizerLanguage(this, mTranslatedText.getText().toString(), LanguagesManager.getSecondLanguageReduction()),
                         mTranslatedText.getText().toString());
                 break;
             case R.id.clearTextMain:

@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Класс для работы с сетью и API.
@@ -21,8 +20,10 @@ public class NetworkManager {
     private static final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
     private Context mContext;
     private String mText;
+    private String mSecondText;
     private String mFirstLanguage;
     private String mSecondLanguage;
+    private String mRightLanguage;
 
     public NetworkManager(Context context, String text) {
         mContext = context;
@@ -36,38 +37,35 @@ public class NetworkManager {
         mSecondLanguage = secondLanguage;
     }
 
-    public String getTranslatedText() {
-        try {
-            return new AsyncRequestToGetTranslatedText().execute(YANDEX_API_KEY,
-                    mText,
-                    mFirstLanguage,
-                    mSecondLanguage).get();
-        } catch (InterruptedException | ExecutionException e) {
-            return "";
-        }
-    }
-
     /**
      * Получение "правильного" сокращения языка.
      * <p>
      * Помогает работать системе по рекомендации языка.
      */
     public String getRightLanguageReduction() {
-        try {
-            return new AsyncRequestToGetRightLanguageReduction().execute(YANDEX_API_KEY, mText).get();
-        } catch (InterruptedException | ExecutionException e) {
-            return "";
-        }
+        new AsyncRequestToGetRightLanguageReduction(new AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
+            @Override
+            public void processFinish(String output) {
+                mRightLanguage = output;
+            }
+        }).execute(mText);
+        return mRightLanguage;
     }
 
-    private class AsyncRequestToGetTranslatedText extends AsyncTask<String, Integer, String> {
+    public static class AsyncRequestToGetTranslatedText extends AsyncTask<String, Integer, String> {
+        public AsyncResponse delegate = null;
+
+        public AsyncRequestToGetTranslatedText(AsyncResponse delegate) {
+            this.delegate = delegate;
+        }
+
         @Override
         protected String doInBackground(String... arg) {
             try {
                 String sURL = String.format("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
                         "key=%s" +
                         "&text=%s" +
-                        "&lang=%s-%s", arg[0], arg[1], arg[2], arg[3]);
+                        "&lang=%s-%s", YANDEX_API_KEY, arg[0], arg[1], arg[2]);
                 URL url = new URL(sURL);
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
                 request.connect();
@@ -79,15 +77,30 @@ public class NetworkManager {
                 return "";
             }
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            delegate.processFinish(s);
+        }
+
+        public interface AsyncResponse {
+            void processFinish(String output);
+        }
     }
 
-    private class AsyncRequestToGetRightLanguageReduction extends AsyncTask<String, Integer, String> {
+    public static class AsyncRequestToGetRightLanguageReduction extends AsyncTask<String, Integer, String> {
+        public AsyncResponse delegate = null;
+
+        public AsyncRequestToGetRightLanguageReduction(AsyncResponse delegate) {
+            this.delegate = delegate;
+        }
+
         @Override
         protected String doInBackground(String... arg) {
             try {
                 String sURL = String.format("https://translate.yandex.net/api/v1.5/tr.json/detect?" +
                         "key=%s" +
-                        "&text=%s", arg[0], arg[1]);
+                        "&text=%s", YANDEX_API_KEY, arg[0]);
                 URL url = new URL(sURL);
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
                 request.connect();
@@ -98,6 +111,15 @@ public class NetworkManager {
             } catch (IOException e) {
                 return "";
             }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            delegate.processFinish(s);
+        }
+
+        public interface AsyncResponse {
+            void processFinish(String output);
         }
     }
 }

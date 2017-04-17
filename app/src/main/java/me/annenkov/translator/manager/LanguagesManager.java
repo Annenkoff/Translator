@@ -62,6 +62,10 @@ public class LanguagesManager {
         return getLanguageReduction(getFirstLanguage());
     }
 
+    public static boolean isLanguageExists(String languageReduction) {
+        return mLanguageReductions.containsValue(languageReduction);
+    }
+
     public static String getSecondLanguage() {
         return sMainActivity.getSecondLanguageButton().getText().toString();
     }
@@ -99,12 +103,11 @@ public class LanguagesManager {
         sMainActivity.getSecondLanguageButton().setText(buffer);
     }
 
-    public static String getVocalizerLanguage(Context context, String text) {
-        String languageReduction = getRightLanguageReduction(context, text);
-        if (languageReduction.equals("en")) return Vocalizer.Language.ENGLISH;
-        if (languageReduction.equals("ru")) return Vocalizer.Language.RUSSIAN;
-        if (languageReduction.equals("uk")) return Vocalizer.Language.UKRAINIAN;
-        if (languageReduction.equals("tr")) return Vocalizer.Language.TURKISH;
+    public static String getVocalizerLanguage(Context context, String text, String language) {
+        if (language.equals("en")) return Vocalizer.Language.ENGLISH;
+        if (language.equals("ru")) return Vocalizer.Language.RUSSIAN;
+        if (language.equals("uk")) return Vocalizer.Language.UKRAINIAN;
+        if (language.equals("tr")) return Vocalizer.Language.TURKISH;
         else return "";
     }
 
@@ -117,23 +120,5 @@ public class LanguagesManager {
         languages.addAll(mLanguageReductions.keySet());
         Collections.sort(languages);
         return languages;
-    }
-
-    public static String getRightLanguageReduction(Context context, String text) {
-        String rightLanguageReduction = new NetworkManager(context, text).getRightLanguageReduction();
-        if (!mLanguageReductions.containsKey(rightLanguageReduction)) return "en";
-        return rightLanguageReduction;
-    }
-
-    public static String getRightLanguage(Context context, String text) {
-        return getLanguage(getRightLanguageReduction(context, text));
-    }
-
-    public static boolean isFirstLanguageRight(Context context, String text) {
-        return text.isEmpty() || getRightLanguage(context, text).equals(getFirstLanguage());
-    }
-
-    public static void makeFirstLanguageRight(Context context, String text) {
-        setFirstLanguage(getRightLanguage(context, text));
     }
 }

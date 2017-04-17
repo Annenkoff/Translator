@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/creation_imageview"
             android:gravity="center_horizontal"
-            android:text="Кажется, выбран неправильный язык для перевода."
+            android:text="@string/selected_wrong_language"
             android:textColor="@color/black"
             android:textSize="20sp"/>
 

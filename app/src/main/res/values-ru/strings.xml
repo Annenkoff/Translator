@@ -32,4 +32,5 @@
     <string name="favorites_cleared_toast">Избранные переводы удалены</string>
     <string name="slide_to_close">Потяни, чтобы закрыть</string>
     <string name="set">Установить</string>
+    <string name="selected_wrong_language">Кажется, выбран неправильный язык для перевода.</string>
 </resources>

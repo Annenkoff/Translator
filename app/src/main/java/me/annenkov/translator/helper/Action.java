@@ -33,13 +33,13 @@ public class Action {
         activity.getVocalizeFirstText().setVisibility(View.INVISIBLE);
     }
 
-    public static void firstLanguageIsRightAction(final MainActivity activity, final String firstText) {
-        activity.getRightLanguageButton().setText(activity.getString(R.string.set) + " " + LanguagesManager.getRightLanguage(activity, firstText));
+    public static void firstLanguageIsRightAction(final MainActivity activity, final String firstText, final String rightLanguage) {
+        activity.getRightLanguageButton().setText(activity.getString(R.string.set) + " " + rightLanguage);
         activity.getRecommendationFloatButton().show();
         activity.getRightLanguageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LanguagesManager.makeFirstLanguageRight(activity, firstText);
+                LanguagesManager.setFirstLanguage(rightLanguage);
                 activity.updateUI();
                 activity.getSlide().hide();
                 activity.getRecommendationFloatButton().hide();
