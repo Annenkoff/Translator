@@ -1,4 +1,4 @@
-package me.annenkov.translator.helper;
+package me.annenkov.translator.tools;
 
 import android.app.Activity;
 import android.content.Intent;

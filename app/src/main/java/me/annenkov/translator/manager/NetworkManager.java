@@ -1,6 +1,5 @@
 package me.annenkov.translator.manager;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import com.google.gson.JsonElement;
@@ -17,40 +16,9 @@ import java.net.URL;
  * Класс для работы с сетью и API.
  */
 public class NetworkManager {
-    private static final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z.e419594abd6d2bd3.da7c18ede5fa233864ef799143b796f59e910c29";
-    private Context mContext;
-    private String mText;
-    private String mSecondText;
-    private String mFirstLanguage;
-    private String mSecondLanguage;
-    private String mRightLanguage;
-
-    public NetworkManager(Context context, String text) {
-        mContext = context;
-        mText = text;
-    }
-
-    public NetworkManager(Context context, String text, String firstLanguage, String secondLanguage) {
-        mContext = context;
-        mText = text;
-        mFirstLanguage = firstLanguage;
-        mSecondLanguage = secondLanguage;
-    }
-
-    /**
-     * Получение "правильного" сокращения языка.
-     * <p>
-     * Помогает работать системе по рекомендации языка.
-     */
-    public String getRightLanguageReduction() {
-        new AsyncRequestToGetRightLanguageReduction(new AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
-            @Override
-            public void processFinish(String output) {
-                mRightLanguage = output;
-            }
-        }).execute(mText);
-        return mRightLanguage;
-    }
+    private static final String YANDEX_API_KEY = "trnsl.1.1.20170317T155546Z" +
+            ".e419594abd6d2bd3" +
+            ".da7c18ede5fa233864ef799143b796f59e910c29";
 
     public static class AsyncRequestToGetTranslatedText extends AsyncTask<String, Integer, String> {
         public AsyncResponse delegate = null;
@@ -62,15 +30,17 @@ public class NetworkManager {
         @Override
         protected String doInBackground(String... arg) {
             try {
-                String sURL = String.format("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
-                        "key=%s" +
-                        "&text=%s" +
-                        "&lang=%s-%s", YANDEX_API_KEY, arg[0], arg[1], arg[2]);
+                String sURL =
+                        String.format("https://translate.yandex.net/api/v1.5/tr.json/translate?" +
+                                "key=%s" +
+                                "&text=%s" +
+                                "&lang=%s-%s", YANDEX_API_KEY, arg[0], arg[1], arg[2]);
                 URL url = new URL(sURL);
                 HttpURLConnection request = (HttpURLConnection) url.openConnection();
                 request.connect();
                 JsonParser jsonParser = new JsonParser();
-                JsonElement root = jsonParser.parse(new InputStreamReader((InputStream) request.getContent()));
+                JsonElement root =
+                        jsonParser.parse(new InputStreamReader((InputStream) request.getContent()));
                 JsonObject jsonObject = root.getAsJsonObject();
                 return jsonObject.get("text").getAsString();
             } catch (IOException e) {

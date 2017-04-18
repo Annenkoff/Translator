@@ -7,6 +7,7 @@ import java.util.TimerTask;
 
 import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.model.HistoryElement;
+import me.annenkov.translator.tools.Action;
 
 /**
  * Класс для работы с таймером.
@@ -81,12 +82,7 @@ public class TimerManager {
 
         @Override
         public void run() {
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mActivity.onTextChangedAction(mNotTranslatedText);
-                }
-            });
+            Action.onTextChangedAction(mActivity, mNotTranslatedText);
         }
     }
 }

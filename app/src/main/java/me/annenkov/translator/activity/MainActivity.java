@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,10 +22,6 @@ import android.widget.Toast;
 
 import com.mancj.slideup.SlideUp;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.orm.SugarContext;
 
@@ -34,15 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.annenkov.translator.R;
-import me.annenkov.translator.helper.Action;
-import me.annenkov.translator.helper.Utils;
-import me.annenkov.translator.manager.CacheManager;
+import me.annenkov.translator.helper.DrawerHelper;
+import me.annenkov.translator.helper.SliderHelper;
 import me.annenkov.translator.manager.HistoryManager;
 import me.annenkov.translator.manager.LanguagesManager;
-import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.manager.SpeechManager;
 import me.annenkov.translator.manager.TimerManager;
 import me.annenkov.translator.model.HistoryElement;
+import me.annenkov.translator.tools.Action;
+import me.annenkov.translator.tools.Utils;
 
 /**
  * Главный Activity. Точка входа в приложение.
@@ -86,62 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mDim = findViewById(R.id.dim);
 
-        mDrawer = new DrawerBuilder()
-                .withActivity(this)
-                .withHeader(R.layout.drawer_header)
-                .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.main_page).withIcon(R.drawable.home).withSelectable(true)
-                                .withSelectedTextColor(ContextCompat.getColor(this, R.color.greyDark)),
-                        new PrimaryDrawerItem().withName(R.string.favorites).withIcon(R.drawable.bookmark_black).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.history).withIcon(R.drawable.history).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.about).withIcon(R.drawable.information).withSelectable(false),
-                        new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName(R.string.github).withIcon(R.drawable.github_circle).withSelectable(false)
-                )
-                .withOnDrawerListener(new Drawer.OnDrawerListener() {
-                    @Override
-                    public void onDrawerOpened(View drawerView) {
-                        Utils.hideKeyboard(MainActivity.this);
-                        if (mSlide.isVisible()) mSlide.hide();
-                    }
-
-                    @Override
-                    public void onDrawerClosed(View drawerView) {
-
-                    }
-
-                    @Override
-                    public void onDrawerSlide(View drawerView, float slideOffset) {
-
-                    }
-                })
-                .withOnDrawerItemClickListener(this)
-                .build();
-        mSlide = new SlideUp.Builder(findViewById(R.id.slide_recommendation))
-                .withListeners(new SlideUp.Listener() {
-                    @Override
-                    public void onSlide(float percent) {
-                        mDim.setAlpha(1 - (percent / 100));
-                    }
-
-                    @Override
-                    public void onVisibilityChanged(final int visibility) {
-                        new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
-                            @Override
-                            public void processFinish(String output) {
-                                if (visibility == View.GONE
-                                        && !output.equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())
-                                        && !mInputText.getText().toString().isEmpty()) {
-                                    mRecommendationFloatButton.show();
-                                }
-                            }
-                        }).execute(LanguagesManager.getFirstLanguageReduction());
-                    }
-                })
-                .withStartState(SlideUp.State.HIDDEN)
-                .withStartGravity(Gravity.TOP)
-                .build();
-
+        mDrawer = new DrawerHelper().getDrawer(this);
+        mSlide = new SliderHelper().getSlider(this);
         mTranslatedTextScrollView = (ScrollView) findViewById(R.id.translatedTextScrollView);
 
         mInputText = (EditText) findViewById(R.id.inputText);
@@ -181,16 +122,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
-                mRecommendationFloatButton.hide();
                 if (TimerManager.getTranslateTimer() != null)
                     TimerManager.cancelTranslateTimer();
                 if (TimerManager.getAddHistoryElementTimer() != null)
                     TimerManager.cancelAddHistoryElementTimer();
                 offAddToFavoritesButton();
                 if (s.length() == 0) {
-                    onTextChangedAction(s.toString());
+                    mClearTextButton.setVisibility(View.INVISIBLE);
+                    Action.onTextChangedAction(MainActivity.this, s.toString());
                     return;
                 }
+                mClearTextButton.setVisibility(View.VISIBLE);
                 TimerManager.startTranslateTimer(MainActivity.this, s.toString());
             }
 
@@ -220,35 +162,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void onTextChangedAction(final String firstText) {
-        String secondText = CacheManager
-                .getTranslationFromText(LanguagesManager.getFirstLanguageReduction(), firstText);
-        if (secondText == null) {
-            new NetworkManager.AsyncRequestToGetTranslatedText(new NetworkManager.AsyncRequestToGetTranslatedText.AsyncResponse() {
-                @Override
-                public void processFinish(String output) {
-                    mRecommendationFloatButton.hide();
-                    mTranslatedText.setText(output);
-                    Action.textStatusAction(MainActivity.this, firstText, output, mTranslatedTextScrollView.getVisibility() == View.VISIBLE);
-                    HistoryElement historyElement = HistoryManager.getCurrentHistoryElement(MainActivity.this);
-                    if (((!output.equals("") || !output.isEmpty()))
-                            && !HistoryManager.getFirstHistoryElement().equals(historyElement))
-                        HistoryManager.addHistoryElementWithTimer(HistoryManager.getCurrentHistoryElement(MainActivity.this));
-                }
-            }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());
-        } else mTranslatedText.setText(secondText);
-        new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
-            @Override
-            public void processFinish(String output) {
-                String rightLanguageReduction = output;
-                if (!LanguagesManager.isLanguageExists(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
-                    rightLanguageReduction = "en";
-                if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
-                    Action.firstLanguageIsRightAction(MainActivity.this, firstText, LanguagesManager.getLanguage(rightLanguageReduction));
-            }
-        }).execute(firstText);
-    }
-
     public Button getFirstLanguageButton() {
         return mFirstLanguageButton;
     }
@@ -259,6 +172,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public SlideUp getSlide() {
         return mSlide;
+    }
+
+    public View getDim() {
+        return mDim;
     }
 
     public FloatingActionButton getRecommendationFloatButton() {
@@ -287,10 +204,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mTranslatedTextScrollView;
     }
 
-    public ImageButton getClearTextButton() {
-        return mClearTextButton;
-    }
-
     public ImageButton getVocalizeFirstText() {
         return mVocalizeFirstText;
     }
@@ -308,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updateUI() {
-        onTextChangedAction(mInputText.getText().toString());
+        Action.onTextChangedAction(this, mInputText.getText().toString());
         updateAddToFavoritesButton();
     }
 
