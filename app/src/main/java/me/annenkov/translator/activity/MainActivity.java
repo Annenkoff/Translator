@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 offAddToFavoritesButton();
                 if (s.length() == 0) {
                     mClearTextButton.setVisibility(View.INVISIBLE);
-                    Action.onTextChangedAction(MainActivity.this, s.toString());
+                    Action.textEmptyAction(MainActivity.this);
                     return;
                 }
                 mClearTextButton.setVisibility(View.VISIBLE);

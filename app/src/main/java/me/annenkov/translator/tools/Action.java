@@ -16,10 +16,10 @@ import me.annenkov.translator.model.HistoryElement;
  * отвечают за основные события в приложении.
  */
 public class Action {
-    private static void textStatusAction(MainActivity activity, String firstText, String secondText, boolean isShowed) {
-        if (!firstText.isEmpty() && !secondText.isEmpty() && !isShowed)
+    private static void textStatusAction(MainActivity activity, String firstText, boolean isShowed) {
+        if (!firstText.isEmpty() && !isShowed)
             textNotEmptyAction(activity);
-        else if (firstText.isEmpty() && secondText.isEmpty() && isShowed) textEmptyAction(activity);
+        else if (firstText.isEmpty() && isShowed) textEmptyAction(activity);
     }
 
     private static void textNotEmptyAction(MainActivity activity) {
@@ -28,7 +28,7 @@ public class Action {
         activity.getVocalizeFirstText().setVisibility(View.VISIBLE);
     }
 
-    private static void textEmptyAction(MainActivity activity) {
+    public static void textEmptyAction(MainActivity activity) {
         activity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(activity, R.anim.hide_element));
         activity.getTranslatedTextScrollView().setVisibility(View.INVISIBLE);
         activity.getVocalizeFirstText().setVisibility(View.INVISIBLE);
@@ -43,7 +43,6 @@ public class Action {
                 LanguagesManager.setFirstLanguage(rightLanguage);
                 activity.updateUI();
                 activity.getSlide().hide();
-                activity.getRecommendationFloatButton().hide();
             }
         });
     }
@@ -55,14 +54,15 @@ public class Action {
     }
 
     private static void translateAction(final MainActivity mainActivity, final String firstText) {
+        mainActivity.getTranslatedText().setText("...");
+        textStatusAction(mainActivity, firstText, mainActivity.getTranslatedTextScrollView().getVisibility() == View.VISIBLE);
         String secondText = CacheManager
                 .getTranslationFromText(LanguagesManager.getFirstLanguageReduction(), firstText);
         if (secondText == null) {
-            new NetworkManager.AsyncRequestToGetTranslatedText(new NetworkManager.AsyncRequestToGetTranslatedText.AsyncResponse() {
+            new NetworkManager.AsyncRequestToGetTranslatedText(mainActivity, new NetworkManager.AsyncRequestToGetTranslatedText.AsyncResponse() {
                 @Override
                 public void processFinish(String output) {
                     mainActivity.getTranslatedText().setText(output);
-                    textStatusAction(mainActivity, firstText, output, mainActivity.getTranslatedTextScrollView().getVisibility() == View.VISIBLE);
                     addInHistoryAction(mainActivity, output);
                 }
             }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());

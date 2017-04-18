@@ -82,7 +82,12 @@ public class TimerManager {
 
         @Override
         public void run() {
-            Action.onTextChangedAction(mActivity, mNotTranslatedText);
+            mActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Action.onTextChangedAction(mActivity, mNotTranslatedText);
+                }
+            });
         }
     }
 }

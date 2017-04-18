@@ -1,5 +1,6 @@
 package me.annenkov.translator.manager;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.google.gson.JsonElement;
@@ -12,6 +13,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import me.annenkov.translator.R;
+
 /**
  * Класс для работы с сетью и API.
  */
@@ -21,10 +24,12 @@ public class NetworkManager {
             ".da7c18ede5fa233864ef799143b796f59e910c29";
 
     public static class AsyncRequestToGetTranslatedText extends AsyncTask<String, Integer, String> {
-        public AsyncResponse delegate = null;
+        public AsyncResponse mDelegate = null;
+        private Context mContext;
 
-        public AsyncRequestToGetTranslatedText(AsyncResponse delegate) {
-            this.delegate = delegate;
+        public AsyncRequestToGetTranslatedText(Context context, AsyncResponse delegate) {
+            mContext = context;
+            mDelegate = delegate;
         }
 
         @Override
@@ -44,13 +49,13 @@ public class NetworkManager {
                 JsonObject jsonObject = root.getAsJsonObject();
                 return jsonObject.get("text").getAsString();
             } catch (IOException e) {
-                return "";
+                return mContext.getString(R.string.network_error);
             }
         }
 
         @Override
         protected void onPostExecute(String s) {
-            delegate.processFinish(s);
+            mDelegate.processFinish(s);
         }
 
         public interface AsyncResponse {

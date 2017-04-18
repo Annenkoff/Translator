@@ -33,4 +33,5 @@
     <string name="slide_to_close">Потяни, чтобы закрыть</string>
     <string name="set">Установить</string>
     <string name="selected_wrong_language">Кажется, выбран неправильный язык для перевода.</string>
+    <string name="network_error">Ошибка при работе с сетью</string>
 </resources>
