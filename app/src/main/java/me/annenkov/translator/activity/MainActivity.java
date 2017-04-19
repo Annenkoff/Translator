@@ -275,9 +275,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.recommendation_float_button_main:
-                Utils.hideKeyboard(this);
                 mSlide.show();
-                mRecommendationFloatButton.hide();
                 break;
             case R.id.swapLanguage:
                 LanguagesManager.swapLanguages();

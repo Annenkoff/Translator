@@ -97,4 +97,24 @@ public class NetworkManager {
             void processFinish(String output);
         }
     }
+
+    public static class RequestToGetRightLanguageReduction extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... arg) {
+            try {
+                String sURL = String.format("https://translate.yandex.net/api/v1.5/tr.json/detect?" +
+                        "key=%s" +
+                        "&text=%s", YANDEX_API_KEY, arg[0]);
+                URL url = new URL(sURL);
+                HttpURLConnection request = (HttpURLConnection) url.openConnection();
+                request.connect();
+                JsonParser jsonParser = new JsonParser();
+                JsonElement root = jsonParser.parse(new InputStreamReader((InputStream) request.getContent()));
+                JsonObject jsonObject = root.getAsJsonObject();
+                return jsonObject.get("lang").getAsString();
+            } catch (IOException e) {
+                return "";
+            }
+        }
+    }
 }

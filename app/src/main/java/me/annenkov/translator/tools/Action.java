@@ -35,7 +35,7 @@ public class Action {
         activity.getRecommendationFloatButton().hide();
     }
 
-    private static void firstLanguageIsRightAction(final MainActivity activity, final String rightLanguage) {
+    private static void firstLanguageIsNotRightAction(final MainActivity activity, final String rightLanguage) {
         activity.getRightLanguageButton().setText(activity.getString(R.string.set) + " " + rightLanguage);
         activity.getRecommendationFloatButton().show();
         activity.getRightLanguageButton().setOnClickListener(new View.OnClickListener() {
@@ -86,7 +86,7 @@ public class Action {
                 if (!LanguagesManager.isLanguageExists(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
                     rightLanguageReduction = "en";
                 if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
-                    firstLanguageIsRightAction(mainActivity, LanguagesManager.getLanguage(rightLanguageReduction));
+                    firstLanguageIsNotRightAction(mainActivity, LanguagesManager.getLanguage(rightLanguageReduction));
             }
         }).execute(firstText);
     }

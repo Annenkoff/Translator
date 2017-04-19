@@ -5,10 +5,13 @@ import android.view.View;
 
 import com.mancj.slideup.SlideUp;
 
+import java.util.concurrent.ExecutionException;
+
 import me.annenkov.translator.R;
 import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.manager.LanguagesManager;
 import me.annenkov.translator.manager.NetworkManager;
+import me.annenkov.translator.tools.Utils;
 
 public class SliderHelper {
     public SlideUp getSlider(final MainActivity mainActivity) {
@@ -21,16 +24,20 @@ public class SliderHelper {
 
                     @Override
                     public void onVisibilityChanged(int visibility) {
-                        if (visibility == View.GONE
-                                && !mainActivity.getInputText().getText().toString().isEmpty()) {
-                            new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
-                                @Override
-                                public void processFinish(String output) {
-                                    if (!output.equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())) {
-                                        mainActivity.getRecommendationFloatButton().show();
-                                    }
-                                }
-                            }).execute(LanguagesManager.getFirstLanguageReduction());
+                        try {
+                            if (visibility == View.GONE
+                                    && !mainActivity.getInputText().getText().toString().isEmpty()
+                                    && !new NetworkManager.RequestToGetRightLanguageReduction()
+                                    .execute(mainActivity.getInputText().getText().toString())
+                                    .get()
+                                    .equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())) {
+                                mainActivity.getRecommendationFloatButton().show();
+                            } else if (visibility == View.VISIBLE) {
+                                Utils.hideKeyboard(mainActivity);
+                                mainActivity.getRecommendationFloatButton().hide();
+                            }
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
                         }
                     }
                 })
