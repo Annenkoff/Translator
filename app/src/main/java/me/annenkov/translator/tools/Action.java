@@ -63,6 +63,7 @@ public class Action {
                 @Override
                 public void processFinish(String output) {
                     mainActivity.getTranslatedText().setText(output);
+                    if (mainActivity.getString(R.string.network_error).equals(output)) return;
                     addInHistoryAction(mainActivity, output);
                 }
             }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());

@@ -20,17 +20,18 @@ public class SliderHelper {
                     }
 
                     @Override
-                    public void onVisibilityChanged(final int visibility) {
-                        new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
-                            @Override
-                            public void processFinish(String output) {
-                                if (visibility == View.GONE
-                                        && !output.equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())
-                                        && !mainActivity.getInputText().getText().toString().isEmpty()) {
-                                    mainActivity.getRecommendationFloatButton().show();
+                    public void onVisibilityChanged(int visibility) {
+                        if (visibility == View.GONE
+                                && !mainActivity.getInputText().getText().toString().isEmpty()) {
+                            new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
+                                @Override
+                                public void processFinish(String output) {
+                                    if (!output.equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())) {
+                                        mainActivity.getRecommendationFloatButton().show();
+                                    }
                                 }
-                            }
-                        }).execute(LanguagesManager.getFirstLanguageReduction());
+                            }).execute(LanguagesManager.getFirstLanguageReduction());
+                        }
                     }
                 })
                 .withStartState(SlideUp.State.HIDDEN)
