@@ -21,6 +21,7 @@ import ru.yandex.speechkit.Vocalizer;
  */
 public class LanguagesManager {
     private static MainActivity sMainActivity;
+    private static boolean isFirstLanguageRight;
     private static Map<String, String> mLanguageReductions;
 
     public static void init(MainActivity activity) {
@@ -46,6 +47,14 @@ public class LanguagesManager {
         mLanguageReductions.put(activity.getResources().getString(R.string.hebrew), "he");
         mLanguageReductions.put(activity.getResources().getString(R.string.latin), "la");
         mLanguageReductions.put(activity.getResources().getString(R.string.lithuanian), "lt");
+    }
+
+    public static boolean isFirstLanguageRight() {
+        return isFirstLanguageRight;
+    }
+
+    public static void setIsFirstLanguageRight(boolean isFirstLanguageRight) {
+        LanguagesManager.isFirstLanguageRight = isFirstLanguageRight;
     }
 
     public static String getFirstLanguage() {

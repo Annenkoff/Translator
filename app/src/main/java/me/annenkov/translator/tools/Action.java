@@ -37,11 +37,13 @@ public class Action {
 
     private static void firstLanguageIsNotRightAction(final MainActivity activity, final String rightLanguage) {
         activity.getRightLanguageButton().setText(activity.getString(R.string.set) + " " + rightLanguage);
+        LanguagesManager.setIsFirstLanguageRight(false);
         activity.getRecommendationFloatButton().show();
         activity.getRightLanguageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LanguagesManager.setFirstLanguage(rightLanguage);
+                LanguagesManager.setIsFirstLanguageRight(true);
                 activity.updateUI();
                 activity.getSlide().hide();
             }
@@ -87,6 +89,7 @@ public class Action {
                     rightLanguageReduction = "en";
                 if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
                     firstLanguageIsNotRightAction(mainActivity, LanguagesManager.getLanguage(rightLanguageReduction));
+                else LanguagesManager.setIsFirstLanguageRight(true);
             }
         }).execute(firstText);
     }

@@ -5,12 +5,9 @@ import android.view.View;
 
 import com.mancj.slideup.SlideUp;
 
-import java.util.concurrent.ExecutionException;
-
 import me.annenkov.translator.R;
 import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.manager.LanguagesManager;
-import me.annenkov.translator.manager.NetworkManager;
 import me.annenkov.translator.tools.Utils;
 
 public class SliderHelper {
@@ -24,25 +21,19 @@ public class SliderHelper {
 
                     @Override
                     public void onVisibilityChanged(int visibility) {
-                        try {
-                            if (visibility == View.GONE
-                                    && !mainActivity.getInputText().getText().toString().isEmpty()
-                                    && !new NetworkManager.RequestToGetRightLanguageReduction()
-                                    .execute(mainActivity.getInputText().getText().toString())
-                                    .get()
-                                    .equalsIgnoreCase(LanguagesManager.getFirstLanguageReduction())) {
-                                mainActivity.getRecommendationFloatButton().show();
-                            } else if (visibility == View.VISIBLE) {
-                                Utils.hideKeyboard(mainActivity);
-                                mainActivity.getRecommendationFloatButton().hide();
-                            }
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
+                        if (visibility == View.GONE
+                                && !mainActivity.getInputText().getText().toString().isEmpty()
+                                && !LanguagesManager.isFirstLanguageRight()) {
+                            mainActivity.getRecommendationFloatButton().show();
+                        } else if (visibility == View.VISIBLE) {
+                            Utils.hideKeyboard(mainActivity);
+                            mainActivity.getRecommendationFloatButton().hide();
                         }
                     }
                 })
                 .withStartState(SlideUp.State.HIDDEN)
                 .withStartGravity(Gravity.TOP)
+                .withLoggingEnabled(true)
                 .build();
     }
 }
