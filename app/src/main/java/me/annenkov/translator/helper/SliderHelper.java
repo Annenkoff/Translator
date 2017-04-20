@@ -33,7 +33,6 @@ public class SliderHelper {
                 })
                 .withStartState(SlideUp.State.HIDDEN)
                 .withStartGravity(Gravity.TOP)
-                .withLoggingEnabled(true)
                 .build();
     }
 }

@@ -44,18 +44,19 @@ public class TimerManager {
      */
     public static void startAddHistoryElementTimer(HistoryElement historyElement) {
         sAddHistoryElementTimer = new Timer(true);
-        sAddHistoryElementTimer.schedule(new TimerTaskToAddHistoryElement(historyElement), 1650);
+        sAddHistoryElementTimer.schedule(new TimerTaskToAddHistoryElement(historyElement), 1700);
     }
 
     /**
-     * Откладывает перевод на определённое время.
+     * Откладывает перевод на определённое время, чтобы не происходило
+     * заспамливания и слишком большой очереди.
      *
      * @param activity  Активити, для выполнения runOnUiThread.
      * @param firstText Ещё не переведённый текст.
      */
     public static void startTranslateTimer(final Activity activity, String firstText) {
         sTranslateTimer = new Timer(true);
-        sTranslateTimer.schedule(new TranslateTimer(activity, firstText), 650);
+        sTranslateTimer.schedule(new TranslateTimer(activity, firstText), 500);
     }
 
     private static class TimerTaskToAddHistoryElement extends java.util.TimerTask {

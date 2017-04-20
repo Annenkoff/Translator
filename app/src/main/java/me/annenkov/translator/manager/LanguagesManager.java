@@ -27,8 +27,10 @@ public class LanguagesManager {
     public static void init(MainActivity activity) {
         sMainActivity = activity;
 
-        activity.getFirstLanguageButton().setText(activity.getResources().getString(R.string.russian));
-        activity.getSecondLanguageButton().setText(activity.getResources().getString(R.string.english));
+        if (getFirstLanguage().isEmpty())
+            activity.getFirstLanguageButton().setText(activity.getResources().getString(R.string.russian));
+        if (getSecondLanguage().isEmpty())
+            activity.getSecondLanguageButton().setText(activity.getResources().getString(R.string.english));
 
         mLanguageReductions = new ArrayMap<>();
         mLanguageReductions.put(activity.getResources().getString(R.string.russian), "ru");
