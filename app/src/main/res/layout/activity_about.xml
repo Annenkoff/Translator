@@ -34,10 +34,10 @@
             android:textSize="38sp"/>
 
         <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_above="@id/app_name_about"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/hand_pointing_right"/>
+            android:src="@drawable/icon"/>
     </RelativeLayout>
 </RelativeLayout>

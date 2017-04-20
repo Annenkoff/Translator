@@ -10,7 +10,7 @@ import android.view.View;
 import me.annenkov.translator.R;
 
 /**
- * Activity с некоторой информацией.
+ * Activity с некоторой информацией о приложении.
  */
 public class AboutActivity extends AppCompatActivity {
     private Toolbar mToolbar;

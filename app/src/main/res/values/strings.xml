@@ -23,7 +23,7 @@
     <string name="empty_history_message">Oops... Your history is empty!</string>
     <string name="empty_favorites_message">Oops... You don\'t have favorite translations.</string>
     <string name="about">About</string>
-    <string name="about_description">for Yandex \"Mobilization\"</string>
+    <string name="about_description">for Yandex \"Mobilization\".</string>
     <string name="clear_all">Clear all</string>
     <string name="text_copied">The text was copied</string>
     <string name="share_via">Share via</string>
