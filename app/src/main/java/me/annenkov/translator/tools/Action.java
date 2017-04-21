@@ -53,8 +53,13 @@ public class Action {
 
     public static void onTextChangedAction(final MainActivity mainActivity, final String firstText) {
         mainActivity.getRecommendationFloatButton().hide();
-        translateAction(mainActivity, firstText);
-        rightLanguageAction(mainActivity, firstText);
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                translateAction(mainActivity, firstText);
+                rightLanguageAction(mainActivity, firstText);
+            }
+        });
     }
 
     private static void translateAction(final MainActivity mainActivity, final String firstText) {
