@@ -32,6 +32,7 @@ public class Action {
         mainActivity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.hide_element));
         mainActivity.getTranslatedTextScrollView().setVisibility(View.INVISIBLE);
         mainActivity.getVocalizeFirstText().setVisibility(View.INVISIBLE);
+        LanguagesManager.setIsFirstLanguageRight(true);
         mainActivity.getRecommendationFloatButton().hide();
     }
 
