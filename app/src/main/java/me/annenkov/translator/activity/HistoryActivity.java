@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.annenkov.translator.Extras;
 import me.annenkov.translator.R;
 import me.annenkov.translator.model.HistoryElement;
 
@@ -52,7 +53,7 @@ public class HistoryActivity extends AppCompatActivity {
         mEmptyHistoryBackgroundNotificationTextView = (TextView) findViewById(R.id.empty_history_backgroung_notification_textview);
         mEmptyHistoryBackgroundNotification = (LinearLayout) findViewById(R.id.empty_history_backgroung_notification);
 
-        isOnlyFavorites = getIntent().getBooleanExtra("IS_ONLY_FAVORITES", false);
+        isOnlyFavorites = getIntent().getBooleanExtra(Extras.EXTRA_IS_ONLY_FAVORITES, false);
 
         updateUI();
     }
@@ -129,7 +130,7 @@ public class HistoryActivity extends AppCompatActivity {
     private void applyChanges() {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
+        bundle.putParcelableArrayList(Extras.EXTRA_NEW_HISTORY, (ArrayList<? extends Parcelable>) mHistoryElements);
         intent.putExtras(bundle);
         setResult(RESULT_OK, intent);
     }
@@ -137,10 +138,10 @@ public class HistoryActivity extends AppCompatActivity {
     private void applyChanges(String text, String firstLanguageReduction, String secondLanguageReduction) {
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList("NEW_HISTORY", (ArrayList<? extends Parcelable>) mHistoryElements);
-        bundle.putString("TEXT_TO_TRANSLATE", text);
-        bundle.putString("FIRST_LANGUAGE", firstLanguageReduction);
-        bundle.putString("SECOND_LANGUAGE", secondLanguageReduction);
+        bundle.putParcelableArrayList(Extras.EXTRA_NEW_HISTORY, (ArrayList<? extends Parcelable>) mHistoryElements);
+        bundle.putString(Extras.EXTRA_TEXT_TO_TRANSLATE, text);
+        bundle.putString(Extras.EXTRA_FIRST_LANGUAGE, firstLanguageReduction);
+        bundle.putString(Extras.EXTRA_SECOND_LANGUAGE, secondLanguageReduction);
         intent.putExtras(bundle);
         setResult(RESULT_OK, intent);
     }

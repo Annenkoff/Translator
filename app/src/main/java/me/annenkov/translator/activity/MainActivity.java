@@ -28,6 +28,7 @@ import com.orm.SugarContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.annenkov.translator.Extras;
 import me.annenkov.translator.R;
 import me.annenkov.translator.helper.DrawerHelper;
 import me.annenkov.translator.helper.SliderHelper;
@@ -242,27 +243,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             switch (requestCode) {
                 case 1:
-                    LanguagesManager.setFirstLanguage(data.getStringExtra("LANGUAGE"));
+                    LanguagesManager.setFirstLanguage(data.getStringExtra(Extras.EXTRA_LANGUAGE));
                     updateUI();
                     break;
                 case 2:
-                    LanguagesManager.setSecondLanguage(data.getStringExtra("LANGUAGE"));
+                    LanguagesManager.setSecondLanguage(data.getStringExtra(Extras.EXTRA_LANGUAGE));
                     updateUI();
                     break;
                 case 3:
-                    HistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
-                    if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
-                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
-                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
-                        mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
+                    HistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra(Extras.EXTRA_NEW_HISTORY));
+                    if (data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE) != null) {
+                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_FIRST_LANGUAGE)));
+                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_SECOND_LANGUAGE)));
+                        mInputText.setText(data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE));
                     }
                     break;
                 case 4:
-                    HistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra("NEW_HISTORY"));
-                    if (data.getStringExtra("TEXT_TO_TRANSLATE") != null) {
-                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra("FIRST_LANGUAGE")));
-                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra("SECOND_LANGUAGE")));
-                        mInputText.setText(data.getStringExtra("TEXT_TO_TRANSLATE"));
+                    HistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra(Extras.EXTRA_NEW_HISTORY));
+                    if (data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE) != null) {
+                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_FIRST_LANGUAGE)));
+                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_SECOND_LANGUAGE)));
+                        mInputText.setText(data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE));
                     }
                     break;
             }
@@ -283,12 +284,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.firstLanguage:
                 Intent intent1 = new Intent(MainActivity.this, SelectLanguageActivity.class);
-                intent1.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) LanguagesManager.getLanguagesList());
+                intent1.putStringArrayListExtra(Extras.EXTRA_LANGUAGES, (ArrayList<String>) LanguagesManager.getLanguagesList());
                 startActivityForResult(intent1, 1);
                 break;
             case R.id.secondLanguage:
                 Intent intent2 = new Intent(MainActivity.this, SelectLanguageActivity.class);
-                intent2.putStringArrayListExtra("LANGUAGES", (ArrayList<String>) LanguagesManager.getLanguagesList());
+                intent2.putStringArrayListExtra(Extras.EXTRA_LANGUAGES, (ArrayList<String>) LanguagesManager.getLanguagesList());
                 startActivityForResult(intent2, 2);
                 break;
             case R.id.vocalizeFirstText:
@@ -340,15 +341,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (position) {
             case 2:
                 intent = new Intent(MainActivity.this, HistoryActivity.class);
-                bundle.putBoolean("IS_ONLY_FAVORITES", true);
-                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) HistoryManager.getHistoryElements());
+                bundle.putBoolean(Extras.EXTRA_IS_ONLY_FAVORITES, true);
+                bundle.putParcelableArrayList(Extras.EXTRA_HISTORY, (ArrayList<? extends Parcelable>) HistoryManager.getHistoryElements());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 3);
                 break;
             case 3:
                 intent = new Intent(MainActivity.this, HistoryActivity.class);
-                bundle.putBoolean("IS_ONLY_FAVORITES", false);
-                bundle.putParcelableArrayList("HISTORY", (ArrayList<? extends Parcelable>) HistoryManager.getHistoryElements());
+                bundle.putBoolean(Extras.EXTRA_IS_ONLY_FAVORITES, false);
+                bundle.putParcelableArrayList(Extras.EXTRA_HISTORY, (ArrayList<? extends Parcelable>) HistoryManager.getHistoryElements());
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 4);
                 break;

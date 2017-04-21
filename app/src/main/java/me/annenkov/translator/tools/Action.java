@@ -16,23 +16,23 @@ import me.annenkov.translator.model.HistoryElement;
  * отвечают за основные события в приложении.
  */
 public class Action {
-    private static void textStatusAction(MainActivity activity, String firstText, boolean isShowed) {
+    private static void textStatusAction(MainActivity mainActivity, String firstText, boolean isShowed) {
         if (!firstText.isEmpty() && !isShowed)
-            textNotEmptyAction(activity);
-        else if (firstText.isEmpty() && isShowed) textEmptyAction(activity);
+            textNotEmptyAction(mainActivity);
+        else if (firstText.isEmpty() && isShowed) textEmptyAction(mainActivity);
     }
 
-    private static void textNotEmptyAction(MainActivity activity) {
-        activity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(activity, R.anim.show_element));
-        activity.getTranslatedTextScrollView().setVisibility(View.VISIBLE);
-        activity.getVocalizeFirstText().setVisibility(View.VISIBLE);
+    private static void textNotEmptyAction(MainActivity mainActivity) {
+        mainActivity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.show_element));
+        mainActivity.getTranslatedTextScrollView().setVisibility(View.VISIBLE);
+        mainActivity.getVocalizeFirstText().setVisibility(View.VISIBLE);
     }
 
-    public static void textEmptyAction(MainActivity activity) {
-        activity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(activity, R.anim.hide_element));
-        activity.getTranslatedTextScrollView().setVisibility(View.INVISIBLE);
-        activity.getVocalizeFirstText().setVisibility(View.INVISIBLE);
-        activity.getRecommendationFloatButton().hide();
+    public static void textEmptyAction(MainActivity mainActivity) {
+        mainActivity.getTranslatedTextScrollView().startAnimation(AnimationUtils.loadAnimation(mainActivity, R.anim.hide_element));
+        mainActivity.getTranslatedTextScrollView().setVisibility(View.INVISIBLE);
+        mainActivity.getVocalizeFirstText().setVisibility(View.INVISIBLE);
+        mainActivity.getRecommendationFloatButton().hide();
     }
 
     private static void firstLanguageIsNotRightAction(final MainActivity activity, final String rightLanguage) {
@@ -84,11 +84,8 @@ public class Action {
         new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
             @Override
             public void processFinish(String output) {
-                String rightLanguageReduction = output;
-                if (!LanguagesManager.isLanguageExists(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
-                    rightLanguageReduction = "en";
-                if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(rightLanguageReduction) && !rightLanguageReduction.isEmpty())
-                    firstLanguageIsNotRightAction(mainActivity, LanguagesManager.getLanguage(rightLanguageReduction));
+                if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(output) && !output.isEmpty())
+                    firstLanguageIsNotRightAction(mainActivity, LanguagesManager.getLanguage(output));
                 else LanguagesManager.setIsFirstLanguageRight(true);
             }
         }).execute(firstText);

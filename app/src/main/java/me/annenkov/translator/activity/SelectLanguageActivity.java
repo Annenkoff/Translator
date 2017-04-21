@@ -15,6 +15,7 @@ import android.widget.Button;
 
 import java.util.List;
 
+import me.annenkov.translator.Extras;
 import me.annenkov.translator.R;
 
 public class SelectLanguageActivity extends AppCompatActivity {
@@ -53,7 +54,7 @@ public class SelectLanguageActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        mLanguages = getIntent().getStringArrayListExtra("LANGUAGES");
+        mLanguages = getIntent().getStringArrayListExtra(Extras.EXTRA_LANGUAGES);
         if (mAdapter == null) {
             mAdapter = new FirstLanguageAdapter();
             mRecyclerView.setAdapter(mAdapter);
@@ -77,7 +78,7 @@ public class SelectLanguageActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             Intent intent = new Intent();
-            intent.putExtra("LANGUAGE", mNameOfLanguage.getText());
+            intent.putExtra(Extras.EXTRA_LANGUAGE, mNameOfLanguage.getText());
             setResult(RESULT_OK, intent);
             finish();
         }
