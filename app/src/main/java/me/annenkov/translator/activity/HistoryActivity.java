@@ -88,7 +88,7 @@ public class HistoryActivity extends AppCompatActivity {
     }
 
     private List<HistoryElement> getElements(boolean isOnlyFavorites) {
-        List<HistoryElement> historyElements = (List<HistoryElement>) getIntent().getSerializableExtra("HISTORY");
+        List<HistoryElement> historyElements = (List<HistoryElement>) getIntent().getSerializableExtra(Extras.EXTRA_HISTORY);
         List<HistoryElement> elements;
         if (isOnlyFavorites) {
             elements = new ArrayList<>();

@@ -74,11 +74,11 @@ public class TimerManager {
 
     private static class TranslateTimer extends TimerTask {
         private MainActivity mMainActivity;
-        private String mNotTranslatedText;
+        private String mFirstText;
 
-        public TranslateTimer(Activity mainActivity, String notTranslatedText) {
+        public TranslateTimer(Activity mainActivity, String firstText) {
             mMainActivity = (MainActivity) mainActivity;
-            mNotTranslatedText = notTranslatedText;
+            mFirstText = firstText;
         }
 
         @Override
@@ -86,7 +86,7 @@ public class TimerManager {
             mMainActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Action.onTextChangedAction(mMainActivity, mNotTranslatedText);
+                    Action.onTextChangedAction(mMainActivity, mFirstText);
                 }
             });
         }

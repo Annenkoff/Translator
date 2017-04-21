@@ -4,7 +4,7 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context="me.annenkov.translator.mainActivity.MainActivity">
+                tools:context="me.annenkov.translator.activity.MainActivity">
 
     <include
         android:id="@+id/toolbar_main"
