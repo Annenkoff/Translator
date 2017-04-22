@@ -75,7 +75,7 @@ public class Action {
         mainActivity.getTranslatedText().setText("...");
         textStatusAction(mainActivity, firstText, mainActivity.getTranslatedTextScrollView().getVisibility() == View.VISIBLE);
         String secondText = CacheManager
-                .getTranslationFromText(LanguagesManager.getFirstLanguageReduction(), firstText);
+                .getTranslationFromText(LanguagesManager.getSecondLanguageReduction(), firstText);
         if (secondText == null) {
             new NetworkManager.AsyncRequestToGetTranslatedText(mainActivity, new NetworkManager.AsyncRequestToGetTranslatedText.AsyncResponse() {
                 @Override
@@ -83,6 +83,7 @@ public class Action {
                     mainActivity.getTranslatedText().setText(output);
                     if (mainActivity.getString(R.string.network_error).equals(output)) return;
                     addInHistoryAction(mainActivity, output);
+                    CacheManager.addToCache(LanguagesManager.getSecondLanguageReduction(), firstText, output);
                 }
             }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());
         } else {

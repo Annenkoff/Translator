@@ -309,10 +309,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.addToFavoritesButtonMain:
                 if (HistoryManager.getCurrentHistoryElement(MainActivity.this).getFirstText().isEmpty())
                     return;
-                TimerManager.cancelAddHistoryElementTimer();
+                if (TimerManager.getAddHistoryElementTimer() != null)
+                    TimerManager.cancelAddHistoryElementTimer();
                 if (HistoryManager.getElementInHistoryIndex(HistoryManager.getCurrentHistoryElement(MainActivity.this)) != 0) {
-                    HistoryManager.getCurrentHistoryElement(MainActivity.this).setFavorite(!HistoryManager.getCurrentHistoryElement(MainActivity.this).isFavorite());
-                    HistoryManager.addHistoryElement(HistoryManager.getCurrentHistoryElement(MainActivity.this));
+                    if (!HistoryManager.getCurrentHistoryElement(MainActivity.this).getSecondText().equals("...")) {
+                        HistoryElement historyElement = HistoryManager.getCurrentHistoryElement(MainActivity.this);
+                        historyElement.setFavorite(!historyElement.isFavorite());
+                        HistoryManager.addHistoryElement(historyElement);
+                    }
                 } else {
                     HistoryElement historyElement = HistoryManager.getFirstHistoryElement();
                     historyElement.setFavorite(!HistoryManager.getFirstHistoryElement().isFavorite());
