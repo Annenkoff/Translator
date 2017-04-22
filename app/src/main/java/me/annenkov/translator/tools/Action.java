@@ -36,6 +36,12 @@ public class Action {
         mainActivity.getRecommendationFloatButton().hide();
     }
 
+    /**
+     * Содержит набор правил для ситуации, когда
+     * язык не совпадает с языком введённого текста:
+     * показывается плавающая кнопка, устанавливается
+     * пояснительный текст на кнопку и т.д.
+     */
     private static void firstLanguageIsNotRightAction(final MainActivity activity, final String rightLanguage) {
         activity.getRightLanguageButton().setText(activity.getString(R.string.set) + " " + rightLanguage);
         LanguagesManager.setIsFirstLanguageRight(false);
@@ -62,6 +68,9 @@ public class Action {
         });
     }
 
+    /**
+     * Переводим текст, добавляем его в историю.
+     */
     private static void translateAction(final MainActivity mainActivity, final String firstText) {
         mainActivity.getTranslatedText().setText("...");
         textStatusAction(mainActivity, firstText, mainActivity.getTranslatedTextScrollView().getVisibility() == View.VISIBLE);
@@ -76,7 +85,10 @@ public class Action {
                     addInHistoryAction(mainActivity, output);
                 }
             }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());
-        } else mainActivity.getTranslatedText().setText(secondText);
+        } else {
+            mainActivity.getTranslatedText().setText(secondText);
+            addInHistoryAction(mainActivity, secondText);
+        }
     }
 
     private static void addInHistoryAction(MainActivity mainActivity, String output) {

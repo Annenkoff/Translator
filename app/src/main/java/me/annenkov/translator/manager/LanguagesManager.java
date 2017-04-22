@@ -134,10 +134,6 @@ public class LanguagesManager {
         return getLanguageReduction(getFirstLanguage());
     }
 
-    public static boolean isLanguageExists(String languageReduction) {
-        return sLanguageReductions.containsValue(languageReduction);
-    }
-
     private static String getSecondLanguage() {
         return sMainActivity.getSecondLanguageButton().getText().toString();
     }
@@ -181,10 +177,6 @@ public class LanguagesManager {
         if (language.equals("uk")) return Vocalizer.Language.UKRAINIAN;
         if (language.equals("tr")) return Vocalizer.Language.TURKISH;
         else return "";
-    }
-
-    public static Map<String, String> getLanguageReductions() {
-        return sLanguageReductions;
     }
 
     public static List<String> getLanguagesList() {

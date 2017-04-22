@@ -43,6 +43,7 @@ import me.annenkov.translator.tools.Utils;
 /**
  * Главный Activity. Точка входа в приложение.
  * Представляет экран для перевода.
+ * Здесь инициализируем основные элементы, геттеры и слушатели.
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerItemClickListener {
     private View mDim;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mShareButton;
 
     /**
-     * Инициализируем методы, которые нам потребуются для работы:
+     * Инициализируем элементы, которые нам потребуются для работы:
      * Тулбар, шторка, слайдер, кнопки, поля и т.д.
      */
     @Override

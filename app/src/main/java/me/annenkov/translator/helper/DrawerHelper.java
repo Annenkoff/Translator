@@ -12,6 +12,9 @@ import me.annenkov.translator.R;
 import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.tools.Utils;
 
+/**
+ * Класс для работы с боковой шторкой.
+ */
 public class DrawerHelper {
     public com.mikepenz.materialdrawer.Drawer getDrawer(final MainActivity mainActivity) {
         return new DrawerBuilder()

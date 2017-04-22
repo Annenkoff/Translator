@@ -10,6 +10,9 @@ import me.annenkov.translator.activity.MainActivity;
 import me.annenkov.translator.manager.LanguagesManager;
 import me.annenkov.translator.tools.Utils;
 
+/**
+ * Класс для работы со слайдером (штука с рекомендацией языка).
+ */
 public class SliderHelper {
     public SlideUp getSlider(final MainActivity mainActivity) {
         return new SlideUp.Builder(mainActivity.findViewById(R.id.slide_recommendation))
