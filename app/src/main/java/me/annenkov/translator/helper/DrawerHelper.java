@@ -33,7 +33,7 @@ public class DrawerHelper {
                     @Override
                     public void onDrawerOpened(View drawerView) {
                         Utils.hideKeyboard(mainActivity);
-                        if (mainActivity.getSlide().isVisible()) mainActivity.getSlide().hide();
+                        if (mainActivity.getSlider().isVisible()) mainActivity.getSlider().hide();
                     }
 
                     @Override

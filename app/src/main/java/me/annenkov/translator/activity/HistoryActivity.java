@@ -50,8 +50,8 @@ public class HistoryActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mEmptyHistoryBackgroundNotificationTextView = (TextView) findViewById(R.id.empty_history_backgroung_notification_textview);
-        mEmptyHistoryBackgroundNotification = (LinearLayout) findViewById(R.id.empty_history_backgroung_notification);
+        mEmptyHistoryBackgroundNotificationTextView = (TextView) findViewById(R.id.empty_background_notification_textview_history);
+        mEmptyHistoryBackgroundNotification = (LinearLayout) findViewById(R.id.empty_background_notification_history);
 
         isOnlyFavorites = getIntent().getBooleanExtra(Extras.EXTRA_IS_ONLY_FAVORITES, false);
 

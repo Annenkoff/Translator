@@ -35,7 +35,7 @@
             android:textSize="20sp"/>
 
         <Button
-            android:id="@+id/right_language_button"
+            android:id="@+id/right_language_button_main"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

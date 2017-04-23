@@ -52,7 +52,7 @@ public class Action {
                 LanguagesManager.setFirstLanguage(rightLanguage);
                 LanguagesManager.setIsFirstLanguageRight(true);
                 activity.updateUI();
-                activity.getSlide().hide();
+                activity.getSlider().hide();
             }
         });
     }

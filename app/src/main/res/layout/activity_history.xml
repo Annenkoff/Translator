@@ -20,7 +20,7 @@
             android:scrollbars="vertical"/>
 
         <LinearLayout
-            android:id="@+id/empty_history_backgroung_notification"
+            android:id="@+id/empty_background_notification_history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -35,7 +35,7 @@
                 android:src="@drawable/sleep"/>
 
             <TextView
-                android:id="@+id/empty_history_backgroung_notification_textview"
+                android:id="@+id/empty_background_notification_textview_history"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 

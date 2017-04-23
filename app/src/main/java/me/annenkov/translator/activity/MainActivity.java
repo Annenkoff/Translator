@@ -46,11 +46,11 @@ import me.annenkov.translator.tools.Utils;
  * Здесь инициализируем основные элементы, геттеры и слушатели.
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerItemClickListener {
-    private View mDim;
+    private View mShading; // Затемнение во время открытия слайдера.
 
     private Toolbar mToolbar;
     private Drawer mDrawer;
-    private SlideUp mSlide;
+    private SlideUp mSlider;
 
     private ScrollView mTranslatedTextScrollView;
 
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTranslatedText;
 
     private FloatingActionButton mRecommendationFloatButton;
-    private Button mRightLanguageButton;
+    private Button mRightLanguageButton; // Кнопка, которая находится в слайдере.
     private Button mFirstLanguageButton;
     private Button mSecondLanguageButton;
     private ImageButton mSwapLanguageButton;
@@ -69,10 +69,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mCopyTextButton;
     private ImageButton mShareButton;
 
-    /**
-     * Инициализируем элементы, которые нам потребуются для работы:
-     * Тулбар, шторка, слайдер, кнопки, поля и т.д.
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,37 +77,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mToolbar = (Toolbar) this.findViewById(R.id.toolbar_main);
         initToolbar();
 
-        mDim = findViewById(R.id.dim);
+        mShading = findViewById(R.id.shading_main);
 
         mDrawer = new DrawerHelper().getDrawer(this);
-        mSlide = new SliderHelper().getSlider(this);
-        mTranslatedTextScrollView = (ScrollView) findViewById(R.id.translatedTextScrollView);
+        mSlider = new SliderHelper().getSlider(this);
+        mTranslatedTextScrollView = (ScrollView) findViewById(R.id.translated_text_scroll_view_main);
 
-        mInputText = (EditText) findViewById(R.id.inputText);
-        mTranslatedText = (TextView) findViewById(R.id.translatedText);
+        mInputText = (EditText) findViewById(R.id.input_text_main);
+        mTranslatedText = (TextView) findViewById(R.id.translated_text_main);
 
         mRecommendationFloatButton = (FloatingActionButton) findViewById(R.id.recommendation_float_button_main);
         mRecommendationFloatButton.hide();
         mRecommendationFloatButton.setOnClickListener(this);
-        mRightLanguageButton = (Button) findViewById(R.id.right_language_button);
+        mRightLanguageButton = (Button) findViewById(R.id.right_language_button_main);
         mRightLanguageButton.setOnClickListener(this);
-        mFirstLanguageButton = (Button) findViewById(R.id.firstLanguage);
+        mFirstLanguageButton = (Button) findViewById(R.id.first_language_main);
         mFirstLanguageButton.setOnClickListener(this);
-        mSecondLanguageButton = (Button) findViewById(R.id.secondLanguage);
+        mSecondLanguageButton = (Button) findViewById(R.id.second_language_main);
         mSecondLanguageButton.setOnClickListener(this);
-        mSwapLanguageButton = (ImageButton) findViewById(R.id.swapLanguage);
+        mSwapLanguageButton = (ImageButton) findViewById(R.id.swap_language_main);
         mSwapLanguageButton.setOnClickListener(this);
-        mVocalizeFirstText = (ImageButton) findViewById(R.id.vocalizeFirstText);
+        mVocalizeFirstText = (ImageButton) findViewById(R.id.vocalize_first_text_main);
         mVocalizeFirstText.setOnClickListener(this);
-        mVocalizeSecondText = (ImageButton) findViewById(R.id.vocalizeSecondText);
+        mVocalizeSecondText = (ImageButton) findViewById(R.id.vocalize_second_text_main);
         mVocalizeSecondText.setOnClickListener(this);
-        mClearTextButton = (ImageButton) findViewById(R.id.clearTextMain);
+        mClearTextButton = (ImageButton) findViewById(R.id.clear_text_main);
         mClearTextButton.setOnClickListener(this);
-        mAddToFavoritesButton = (ImageButton) findViewById(R.id.addToFavoritesButtonMain);
+        mAddToFavoritesButton = (ImageButton) findViewById(R.id.add_to_favorites_button_main);
         mAddToFavoritesButton.setOnClickListener(this);
-        mCopyTextButton = (ImageButton) findViewById(R.id.copyTextButtonMenu);
+        mCopyTextButton = (ImageButton) findViewById(R.id.copy_text_button_menu_main);
         mCopyTextButton.setOnClickListener(this);
-        mShareButton = (ImageButton) findViewById(R.id.shareButtonMenu);
+        mShareButton = (ImageButton) findViewById(R.id.share_button_menu_main);
         mShareButton.setOnClickListener(this);
 
         LanguagesManager.init(this);
@@ -144,15 +140,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void initToolbar() {
-        setSupportActionBar(mToolbar);
-        mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.menu));
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDrawer.openDrawer();
-            }
-        });
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SugarContext.terminate();
     }
 
     @Override
@@ -164,34 +155,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public Button getFirstLanguageButton() {
-        return mFirstLanguageButton;
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);
+        mToolbar.setNavigationIcon(ContextCompat.getDrawable(this, R.drawable.menu));
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawer.openDrawer();
+            }
+        });
     }
 
-    public Button getSecondLanguageButton() {
-        return mSecondLanguageButton;
+    public View getShading() {
+        return mShading;
     }
 
-    public SlideUp getSlide() {
-        return mSlide;
+    public SlideUp getSlider() {
+        return mSlider;
     }
 
-    public View getDim() {
-        return mDim;
-    }
-
-    public FloatingActionButton getRecommendationFloatButton() {
-        return mRecommendationFloatButton;
-    }
-
-    public Button getRightLanguageButton() {
-        return mRightLanguageButton;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        SugarContext.terminate();
+    public ScrollView getTranslatedTextScrollView() {
+        return mTranslatedTextScrollView;
     }
 
     public EditText getInputText() {
@@ -202,12 +186,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return mTranslatedText;
     }
 
-    public ScrollView getTranslatedTextScrollView() {
-        return mTranslatedTextScrollView;
+    public FloatingActionButton getRecommendationFloatButton() {
+        return mRecommendationFloatButton;
+    }
+
+    public Button getRightLanguageButton() {
+        return mRightLanguageButton;
+    }
+
+    public Button getFirstLanguageButton() {
+        return mFirstLanguageButton;
+    }
+
+    public Button getSecondLanguageButton() {
+        return mSecondLanguageButton;
     }
 
     public ImageButton getVocalizeFirstText() {
         return mVocalizeFirstText;
+    }
+
+    public void updateAddToFavoritesButton() {
+        try {
+            if (HistoryManager.getFirstHistoryElement().isFavorite()) {
+                onAddToFavoritesButton();
+            } else {
+                offAddToFavoritesButton();
+            }
+        } catch (NullPointerException ignored) {
+        }
     }
 
     private void offAddToFavoritesButton() {
@@ -225,17 +232,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void updateUI() {
         Action.onTextChangedAction(this, mInputText.getText().toString());
         updateAddToFavoritesButton();
-    }
-
-    public void updateAddToFavoritesButton() {
-        try {
-            if (HistoryManager.getFirstHistoryElement().isFavorite()) {
-                onAddToFavoritesButton();
-            } else {
-                offAddToFavoritesButton();
-            }
-        } catch (NullPointerException ignored) {
-        }
     }
 
     @Override
@@ -277,36 +273,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.recommendation_float_button_main:
-                mSlide.show();
+                mSlider.show();
                 break;
-            case R.id.swapLanguage:
+            case R.id.swap_language_main:
                 LanguagesManager.swapLanguages();
                 updateUI();
                 break;
-            case R.id.firstLanguage:
+            case R.id.first_language_main:
                 Intent intent1 = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent1.putStringArrayListExtra(Extras.EXTRA_LANGUAGES, (ArrayList<String>) LanguagesManager.getLanguagesList());
                 startActivityForResult(intent1, 1);
                 break;
-            case R.id.secondLanguage:
+            case R.id.second_language_main:
                 Intent intent2 = new Intent(MainActivity.this, SelectLanguageActivity.class);
                 intent2.putStringArrayListExtra(Extras.EXTRA_LANGUAGES, (ArrayList<String>) LanguagesManager.getLanguagesList());
                 startActivityForResult(intent2, 2);
                 break;
-            case R.id.vocalizeFirstText:
+            case R.id.vocalize_first_text_main:
                 SpeechManager.vocalizeText(this,
                         LanguagesManager.getVocalizerLanguage(this, mInputText.getText().toString(), LanguagesManager.getFirstLanguageReduction()),
                         mInputText.getText().toString());
                 break;
-            case R.id.vocalizeSecondText:
+            case R.id.vocalize_second_text_main:
                 SpeechManager.vocalizeText(this,
                         LanguagesManager.getVocalizerLanguage(this, mTranslatedText.getText().toString(), LanguagesManager.getSecondLanguageReduction()),
                         mTranslatedText.getText().toString());
                 break;
-            case R.id.clearTextMain:
+            case R.id.clear_text_main:
                 clearText();
                 break;
-            case R.id.addToFavoritesButtonMain:
+            case R.id.add_to_favorites_button_main:
                 if (HistoryManager.getCurrentHistoryElement(MainActivity.this).getFirstText().isEmpty())
                     return;
                 if (TimerManager.getAddHistoryElementTimer() != null)
@@ -324,13 +320,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 updateAddToFavoritesButton();
                 break;
-            case R.id.copyTextButtonMenu:
+            case R.id.copy_text_button_menu_main:
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Text", mTranslatedText.getText());
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(this, getString(R.string.text_copied), Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.shareButtonMenu:
+            case R.id.share_button_menu_main:
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, mTranslatedText.getText());

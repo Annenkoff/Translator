@@ -19,7 +19,7 @@ public class SliderHelper {
                 .withListeners(new SlideUp.Listener() {
                     @Override
                     public void onSlide(float percent) {
-                        mainActivity.getDim().setAlpha(1 - (percent / 100));
+                        mainActivity.getShading().setAlpha(1 - (percent / 100));
                     }
 
                     @Override

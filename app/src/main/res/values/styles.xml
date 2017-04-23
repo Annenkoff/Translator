@@ -12,7 +12,7 @@
         <item name="colorAccent">@color/lightRed</item>
     </style>
 
-    <style name="TranslatedTextCardViewStyle" parent="Theme.AppCompat.Light">
+    <style name="translated_text_card_view_style" parent="Theme.AppCompat.Light">
         <item name="android:height">150dp</item>
         <item name="cardBackgroundColor">@color/grey</item>
     </style>

@@ -11,7 +11,7 @@
         layout="@layout/toolbar_main"/>
 
     <FrameLayout
-        android:id="@+id/dim"
+        android:id="@+id/shading_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0"
@@ -36,7 +36,7 @@
         android:layout_below="@id/toolbar_main">
 
         <ImageButton
-            android:id="@+id/swapLanguage"
+            android:id="@+id/swap_language_main"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -45,26 +45,26 @@
             android:src="@drawable/swap_horizontal"/>
 
         <Button
-            android:id="@+id/firstLanguage"
+            android:id="@+id/first_language_main"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentTop="true"
-            android:layout_toStartOf="@id/swapLanguage"/>
+            android:layout_toStartOf="@id/swap_language_main"/>
 
         <Button
-            android:id="@+id/secondLanguage"
+            android:id="@+id/second_language_main"
             style="@style/Base.Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@id/swapLanguage"/>
+            android:layout_toEndOf="@id/swap_language_main"/>
 
         <EditText
-            android:id="@+id/inputText"
+            android:id="@+id/input_text_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/swapLanguage"
+            android:layout_below="@id/swap_language_main"
             android:layout_centerHorizontal="true"
             android:layout_marginLeft="7dp"
             android:layout_marginRight="7dp"
@@ -77,36 +77,36 @@
             android:textSize="22sp"/>
 
         <ImageButton
-            android:id="@+id/clearTextMain"
+            android:id="@+id/clear_text_main"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_alignRight="@id/inputText"
-            android:layout_alignTop="@id/inputText"
+            android:layout_alignRight="@id/input_text_main"
+            android:layout_alignTop="@id/input_text_main"
             android:layout_margin="7dp"
             android:src="@drawable/close"
             android:visibility="invisible"/>
 
         <ImageButton
-            android:id="@+id/vocalizeFirstText"
+            android:id="@+id/vocalize_first_text_main"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_alignBottom="@id/inputText"
-            android:layout_alignRight="@id/inputText"
+            android:layout_alignBottom="@id/input_text_main"
+            android:layout_alignRight="@id/input_text_main"
             android:layout_margin="7dp"
             android:src="@drawable/voice_black"
             android:visibility="invisible"/>
 
         <ScrollView
-            android:id="@+id/translatedTextScrollView"
+            android:id="@+id/translated_text_scroll_view_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/inputText"
+            android:layout_below="@id/input_text_main"
             android:visibility="invisible">
 
             <android.support.v7.widget.CardView
-                style="@style/TranslatedTextCardViewStyle"
+                style="@style/translated_text_card_view_style"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -114,17 +114,17 @@
                 android:scrollbars="vertical">
 
                 <TextView
-                    android:id="@+id/translatedText"
+                    android:id="@+id/translated_text_main"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/inputText"
+                    android:layout_below="@id/input_text_main"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="35dp"
                     android:textColor="@color/white"
                     android:textSize="22sp"/>
 
                 <ImageButton
-                    android:id="@+id/addToFavoritesButtonMain"
+                    android:id="@+id/add_to_favorites_button_main"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
@@ -140,7 +140,7 @@
                     android:orientation="horizontal">
 
                     <ImageButton
-                        android:id="@+id/shareButtonMenu"
+                        android:id="@+id/share_button_menu_main"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -148,7 +148,7 @@
                         android:src="@drawable/share_variant"/>
 
                     <ImageButton
-                        android:id="@+id/copyTextButtonMenu"
+                        android:id="@+id/copy_text_button_menu_main"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -156,7 +156,7 @@
                         android:src="@drawable/content_copy"/>
 
                     <ImageButton
-                        android:id="@+id/vocalizeSecondText"
+                        android:id="@+id/vocalize_second_text_main"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
