@@ -42,17 +42,17 @@ public class Action {
      * показывается плавающая кнопка, устанавливается
      * пояснительный текст на кнопку и т.д.
      */
-    private static void firstLanguageIsNotRightAction(final MainActivity activity, final String rightLanguage) {
-        activity.getRightLanguageButton().setText(activity.getString(R.string.set) + " " + rightLanguage);
+    private static void firstLanguageIsNotRightAction(final MainActivity mainActivity, final String rightLanguage) {
+        mainActivity.getRightLanguageButton().setText(mainActivity.getString(R.string.set) + " " + rightLanguage);
         LanguagesManager.setIsFirstLanguageRight(false);
-        activity.getRecommendationFloatButton().show();
-        activity.getRightLanguageButton().setOnClickListener(new View.OnClickListener() {
+        mainActivity.getRecommendationFloatButton().show();
+        mainActivity.getRightLanguageButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LanguagesManager.setFirstLanguage(rightLanguage);
+                LanguagesManager.setFirstLanguage(mainActivity, rightLanguage);
                 LanguagesManager.setIsFirstLanguageRight(true);
-                activity.updateUI();
-                activity.getSlider().hide();
+                mainActivity.updateUI();
+                mainActivity.getSlider().hide();
             }
         });
     }
@@ -75,7 +75,7 @@ public class Action {
         mainActivity.getTranslatedText().setText("...");
         textStatusAction(mainActivity, firstText, mainActivity.getTranslatedTextScrollView().getVisibility() == View.VISIBLE);
         String secondText = CacheManager
-                .getTranslationFromText(LanguagesManager.getSecondLanguageReduction(), firstText);
+                .getTranslationFromText(LanguagesManager.getSecondLanguageReduction(mainActivity), firstText);
         if (secondText == null) {
             new NetworkManager.AsyncRequestToGetTranslatedText(mainActivity, new NetworkManager.AsyncRequestToGetTranslatedText.AsyncResponse() {
                 @Override
@@ -83,9 +83,9 @@ public class Action {
                     mainActivity.getTranslatedText().setText(output);
                     if (mainActivity.getString(R.string.network_error).equals(output)) return;
                     addInHistoryAction(mainActivity, output);
-                    CacheManager.addToCache(LanguagesManager.getSecondLanguageReduction(), firstText, output);
+                    CacheManager.addToCache(LanguagesManager.getSecondLanguageReduction(mainActivity), firstText, output);
                 }
-            }).execute(firstText, LanguagesManager.getFirstLanguageReduction(), LanguagesManager.getSecondLanguageReduction());
+            }).execute(firstText, LanguagesManager.getFirstLanguageReduction(mainActivity), LanguagesManager.getSecondLanguageReduction(mainActivity));
         } else {
             mainActivity.getTranslatedText().setText(secondText);
             addInHistoryAction(mainActivity, secondText);
@@ -103,7 +103,7 @@ public class Action {
         new NetworkManager.AsyncRequestToGetRightLanguageReduction(new NetworkManager.AsyncRequestToGetRightLanguageReduction.AsyncResponse() {
             @Override
             public void processFinish(String output) {
-                if (!LanguagesManager.getFirstLanguageReduction().equalsIgnoreCase(output) && !output.isEmpty())
+                if (!LanguagesManager.getFirstLanguageReduction(mainActivity).equalsIgnoreCase(output) && !output.isEmpty())
                     firstLanguageIsNotRightAction(mainActivity, LanguagesManager.getLanguage(output));
                 else LanguagesManager.setIsFirstLanguageRight(true);
             }

@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -45,12 +46,17 @@ import me.annenkov.translator.tools.Utils;
  * Представляет экран для перевода.
  * Здесь инициализируем основные элементы, геттеры и слушатели.
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Drawer.OnDrawerItemClickListener {
-    private View mShading; // Затемнение во время открытия слайдера.
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        Drawer.OnDrawerItemClickListener {
+    private static final String APP_PREFERENCES = "status";
+
+    private SharedPreferences mSharedPreferences;
 
     private Toolbar mToolbar;
     private Drawer mDrawer;
     private SlideUp mSlider;
+
+    private View mShading; // Затемнение во время открытия слайдера.
 
     private ScrollView mTranslatedTextScrollView;
 
@@ -73,20 +79,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mSharedPreferences = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
         SugarContext.init(this);
         mToolbar = (Toolbar) this.findViewById(R.id.toolbar_main);
         initToolbar();
 
-        mShading = findViewById(R.id.shading_main);
-
         mDrawer = new DrawerHelper().getDrawer(this);
         mSlider = new SliderHelper().getSlider(this);
-        mTranslatedTextScrollView = (ScrollView) findViewById(R.id.translated_text_scroll_view_main);
+        mTranslatedTextScrollView =
+                (ScrollView) findViewById(R.id.translated_text_scroll_view_main);
+
+        mShading = findViewById(R.id.shading_main);
 
         mInputText = (EditText) findViewById(R.id.input_text_main);
         mTranslatedText = (TextView) findViewById(R.id.translated_text_main);
 
-        mRecommendationFloatButton = (FloatingActionButton) findViewById(R.id.recommendation_float_button_main);
+        mRecommendationFloatButton =
+                (FloatingActionButton) findViewById(R.id.recommendation_float_button_main);
         mRecommendationFloatButton.hide();
         mRecommendationFloatButton.setOnClickListener(this);
         mRightLanguageButton = (Button) findViewById(R.id.right_language_button_main);
@@ -141,6 +150,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(Extras.PREFERENCE_FIRST_LANGUAGE,
+                LanguagesManager.getFirstLanguageReduction(this));
+        editor.putString(Extras.PREFERENCE_SECOND_LANGUAGE,
+                LanguagesManager.getSecondLanguageReduction(this));
+        editor.apply();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         SugarContext.terminate();
@@ -164,6 +184,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawer.openDrawer();
             }
         });
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
     }
 
     public View getShading() {
@@ -240,26 +264,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             switch (requestCode) {
                 case 1:
-                    LanguagesManager.setFirstLanguage(data.getStringExtra(Extras.EXTRA_LANGUAGE));
+                    LanguagesManager.setFirstLanguage(this,
+                            data.getStringExtra(Extras.EXTRA_LANGUAGE));
                     updateUI();
                     break;
                 case 2:
-                    LanguagesManager.setSecondLanguage(data.getStringExtra(Extras.EXTRA_LANGUAGE));
+                    LanguagesManager.setSecondLanguage(this,
+                            data.getStringExtra(Extras.EXTRA_LANGUAGE));
                     updateUI();
                     break;
                 case 3:
-                    HistoryManager.updateHistory((List<HistoryElement>) data.getSerializableExtra(Extras.EXTRA_NEW_HISTORY));
+                    HistoryManager.updateHistory((List<HistoryElement>) data
+                            .getSerializableExtra(Extras.EXTRA_NEW_HISTORY));
                     if (data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE) != null) {
-                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_FIRST_LANGUAGE)));
-                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_SECOND_LANGUAGE)));
+                        LanguagesManager.setFirstLanguage(this, LanguagesManager
+                                .getLanguage(data.getStringExtra(Extras.EXTRA_FIRST_LANGUAGE)));
+                        LanguagesManager.setSecondLanguage(this, LanguagesManager
+                                .getLanguage(data.getStringExtra(Extras.EXTRA_SECOND_LANGUAGE)));
                         mInputText.setText(data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE));
                     }
                     break;
                 case 4:
-                    HistoryManager.setHistoryElements((List<HistoryElement>) data.getSerializableExtra(Extras.EXTRA_NEW_HISTORY));
+                    HistoryManager.setHistoryElements((List<HistoryElement>) data
+                            .getSerializableExtra(Extras.EXTRA_NEW_HISTORY));
                     if (data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE) != null) {
-                        LanguagesManager.setFirstLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_FIRST_LANGUAGE)));
-                        LanguagesManager.setSecondLanguage(LanguagesManager.getLanguage(data.getStringExtra(Extras.EXTRA_SECOND_LANGUAGE)));
+                        LanguagesManager.setFirstLanguage(this, LanguagesManager
+                                .getLanguage(data.getStringExtra(Extras.EXTRA_FIRST_LANGUAGE)));
+                        LanguagesManager.setSecondLanguage(this, LanguagesManager
+                                .getLanguage(data.getStringExtra(Extras.EXTRA_SECOND_LANGUAGE)));
                         mInputText.setText(data.getStringExtra(Extras.EXTRA_TEXT_TO_TRANSLATE));
                     }
                     break;
@@ -276,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mSlider.show();
                 break;
             case R.id.swap_language_main:
-                LanguagesManager.swapLanguages();
+                LanguagesManager.swapLanguages(this);
                 updateUI();
                 break;
             case R.id.first_language_main:
@@ -291,12 +323,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.vocalize_first_text_main:
                 SpeechManager.vocalizeText(this,
-                        LanguagesManager.getVocalizerLanguage(this, mInputText.getText().toString(), LanguagesManager.getFirstLanguageReduction()),
+                        LanguagesManager.getVocalizerLanguage(LanguagesManager.getFirstLanguageReduction(this)),
                         mInputText.getText().toString());
                 break;
             case R.id.vocalize_second_text_main:
                 SpeechManager.vocalizeText(this,
-                        LanguagesManager.getVocalizerLanguage(this, mTranslatedText.getText().toString(), LanguagesManager.getSecondLanguageReduction()),
+                        LanguagesManager.getVocalizerLanguage(LanguagesManager.getSecondLanguageReduction(this)),
                         mTranslatedText.getText().toString());
                 break;
             case R.id.clear_text_main:

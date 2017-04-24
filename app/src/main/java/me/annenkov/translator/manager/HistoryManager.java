@@ -59,13 +59,14 @@ public class HistoryManager {
      * и не обязательно хранится в истории в данный момент. Сделано для того, чтобы
      * не происходило дублирования при добавлении в избранное на главном экране.
      *
-     * @param activity Активити, из которого берётся информация о текстах.
+     * @param mainActivity Активити, из которого берётся информация о текстах.
      */
-    public static HistoryElement getCurrentHistoryElement(MainActivity activity) {
-        return new HistoryElement(LanguagesManager.getFirstLanguageReduction().toUpperCase(),
-                LanguagesManager.getSecondLanguageReduction().toUpperCase(),
-                activity.getInputText().getText().toString(),
-                activity.getTranslatedText().getText().toString());
+    public static HistoryElement getCurrentHistoryElement(MainActivity mainActivity) {
+        return new HistoryElement(LanguagesManager.getFirstLanguageReduction(mainActivity)
+                .toUpperCase(),
+                LanguagesManager.getSecondLanguageReduction(mainActivity).toUpperCase(),
+                mainActivity.getInputText().getText().toString(),
+                mainActivity.getTranslatedText().getText().toString());
     }
 
     /**

@@ -9,4 +9,6 @@ public class Extras {
     public static final String EXTRA_LANGUAGES = "me.annenkov.translator.languages";
     public static final String EXTRA_IS_ONLY_FAVORITES = "me.annenkov.translator.is_only_favorites";
     public static final String EXTRA_HISTORY = "me.annenkov.translator.history";
+    public static final String PREFERENCE_FIRST_LANGUAGE = "first_language";
+    public static final String PREFERENCE_SECOND_LANGUAGE = "second_language";
 }
